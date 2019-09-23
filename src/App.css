@@ -1,5 +1,6 @@
 .App {
-  text-align: center;
+  display: flex;
+  flex-direction: column;
 }
 
 .App-logo {
@@ -23,6 +24,14 @@
 
 body {
   background-color: #ddf3fa;
+}
+
+.note-title {
+  font-size: 150%;
+  text-align: left;
+  font-weight: bold;
+  padding: 10px;
+  padding-bottom: 20px;
 }
 
 .timestamp {
@@ -52,12 +61,12 @@ body {
 
 .noterow-unfocused .entrybox {
   color: gray;
-} 
+}
 
 .noterow {
   display: flex;
   width: 100%;
-  font-size: 120%
+  font-size: 120%;
 }
 
 .noterow-unfocused {

@@ -3,9 +3,13 @@ import './App.css';
 import { Timestamp } from './timestamp';
 import { NoteRow } from './noterow';
 import { NoteLine } from './NoteLine';
+import { NoteTitle } from './notetitle';
+import { Note } from './Note';
 
 
-interface AppProps { }
+interface AppProps {
+  note: Note;
+}
 interface AppState {
   notes: Array<NoteLine>
   focusedNoteId: number
@@ -28,6 +32,7 @@ class App extends React.Component<AppProps, AppState> {
 
     return (
       <div className="App" ref={this.wrapperElement}>
+        <NoteTitle initialTitle={this.props.note.getTitle()} />
         {noteRows}
       </div>
     );
@@ -38,6 +43,7 @@ class App extends React.Component<AppProps, AppState> {
       let notes = this.state.notes.slice();
       let newNote = new NoteLine(new Date());
       notes.push(newNote);
+
       return { notes: notes, focusedNoteId: newNote.id }
     });
   }
