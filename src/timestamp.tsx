@@ -1,57 +1,59 @@
 import React from "react";
 
 interface TimestampState {
-  timestamp: Date;
-  hasFocus: boolean;
+    timestamp: Date;
 }
 
-interface TimestampProps {}
+interface TimestampProps {
+    focused: boolean;
+    initialTimestamp: Date;
+}
 
 export class Timestamp extends React.Component<TimestampProps, TimestampState> {
-  interval: number;
+    interval: number;
 
-  constructor(props: Object) {
-    super(props);
-    this.state = { timestamp: new Date(), hasFocus: true };
-    this.interval = -1;
-  }
-
-  render() {
-    return (
-      <span className="timestamp">
-        {this.state.timestamp.toLocaleString("en-us", {
-          hour: "2-digit",
-          minute: "2-digit",
-          second: "2-digit",
-          hour12: false
-        })}
-      </span>
-    );
-  }
-
-  tick() {
-    this.setState(state => ({ timestamp: new Date() }));
-  }
-
-  componentDidUpdate(_: TimestampProps, prevState: TimestampState) {
-    if (prevState.hasFocus != this.state.hasFocus) {
-      if (this.state.hasFocus) {
-        this.setupTimer();
-      } else {
-        window.clearInterval(this.interval);
-      }
+    constructor(props: TimestampProps) {
+        super(props);
+        this.state = { timestamp: this.props.initialTimestamp };
+        this.interval = -1;
     }
-  }
 
-  componentDidMount() {
-    this.setupTimer();
-  }
+    render() {
+        return (
+            <span className="timestamp">
+                {this.state.timestamp.toLocaleString("en-us", {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    second: "2-digit",
+                    hour12: false
+                })}
+            </span>
+        );
+    }
 
-  setupTimer() {
-    this.interval = window.setInterval(() => this.tick(), 500);
-  }
+    tick() {
+        this.setState(state => ({ timestamp: new Date() }));
+    }
 
-  componentWillUnmount() {
-    window.clearInterval(this.interval);
-  }
+    componentDidMount() {
+        this.setupTimer();
+    }
+
+    componentDidUpdate(prevProps: TimestampProps, prevState: TimestampState) {
+        if (prevProps.focused !== this.props.focused) {
+            if (this.props.focused) {
+                this.setupTimer();
+            } else {
+                window.clearInterval(this.interval);
+            }
+        }
+    }
+
+    setupTimer() {
+        this.interval = window.setInterval(() => this.tick(), 500);
+    }
+
+    componentWillUnmount() {
+        window.clearInterval(this.interval);
+    }
 }

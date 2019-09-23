@@ -20,3 +20,46 @@
 .App-link {
   color: #09d3ac;
 }
+
+body {
+  background-color: #ddf3fa;
+}
+
+.timestamp {
+  padding: 0px 5px;
+  border-right: 2px solid black;
+  align-self: center;
+}
+
+.noterow-focused .timestamp {
+  font-weight: bold;
+}
+
+.noterow-unfocused .timestamp {
+  /* Compensate for bold/unbolding */
+  padding-right: 8px;
+}
+
+.entrybox {
+  width: 100%;
+  margin-left: 5px;
+  border: none;
+  outline: none;
+  height: fit-content;
+  font-size: 120%;
+  background-color: #ddf3fa;
+}
+
+.noterow-unfocused .entrybox {
+  color: gray;
+} 
+
+.noterow {
+  display: flex;
+  width: 100%;
+  font-size: 120%
+}
+
+.noterow-unfocused {
+  color: gray;
+}
