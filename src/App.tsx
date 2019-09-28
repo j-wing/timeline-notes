@@ -26,8 +26,12 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   render() {
-    let noteRows = this.state.notes.map(note => {
-      return (<NoteRow newLineHandler={this.handleNoteRowNewLine.bind(this)} focusHandler={this.noteRowFocusHandler.bind(this)} note={note} key={note.id} focused={note.id === this.state.focusedNoteId} />);
+    let noteRows = this.state.notes.map(noteRow => {
+      return (<NoteRow keyDownHandler={this.handleNoteRowKeyDown.bind(this)}
+        focusHandler={this.noteRowFocusHandler.bind(this)}
+        noteRow={noteRow}
+        key={noteRow.id}
+        focused={noteRow.id === this.state.focusedNoteId} />);
     });
 
     return (
@@ -38,14 +42,20 @@ class App extends React.Component<AppProps, AppState> {
     );
   }
 
-  handleNoteRowNewLine(noteRow: NoteLine) {
-    this.setState((props, state) => {
-      let notes = this.state.notes.slice();
-      let newNote = new NoteLine(new Date());
-      notes.push(newNote);
+  handleNoteRowKeyDown(noteRow: NoteLine, e: React.KeyboardEvent) {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      this.setState((props, state) => {
+        let notes = this.state.notes.slice();
+        let newNote = new NoteLine(new Date(), noteRow.getIndentedUnits());
+        notes.push(newNote);
 
-      return { notes: notes, focusedNoteId: newNote.id }
-    });
+        return { notes: notes, focusedNoteId: newNote.id }
+      });
+      return false;
+    } else {
+      return true;
+    }
   }
 
   noteRowFocusHandler(note: NoteLine) {

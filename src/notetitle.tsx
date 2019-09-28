@@ -21,7 +21,11 @@ export class NoteTitle extends React.Component<NoteTitleProps, NoteTitleState> {
 
     render() {
         return (
-            <div className="note-title" ref={this.divRef} onClick={this.handleClick.bind(this)} contentEditable={true} onKeyDown={this.handleKeyDown.bind(this)}>
+            <div className="note-title"
+            ref={this.divRef}
+            onClick={this.handleClick.bind(this)}
+            contentEditable={true}
+            onKeyDown={this.handleKeyDown.bind(this)}>
                 {this.state.title}
             </div>
         )
