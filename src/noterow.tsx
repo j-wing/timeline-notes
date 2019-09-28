@@ -1,6 +1,5 @@
 import React from "react";
 import { Timestamp } from "./timestamp";
-import { Entrybox } from "./entrybox";
 import { NoteLine } from "./NoteLine";
 
 interface NoteRowProps {
@@ -46,6 +45,7 @@ export class NoteRow extends React.Component<NoteRowProps, NoteRowState> {
     }
 
     computeEntryboxContent(indentedUnits: number, rawContent: string) {
+        /*eslint no-array-constructor: "error"*/
         let indentPrefix = new Array(indentedUnits * INDENT_LENGTH)
             .fill(" ")
             .join("");
@@ -54,14 +54,14 @@ export class NoteRow extends React.Component<NoteRowProps, NoteRowState> {
 
 
     componentDidUpdate(oldProps: NoteRowProps, oldState: NoteRowState) {
-        if (oldState.indentedUnits != this.state.indentedUnits) {
+        if (oldState.indentedUnits !== this.state.indentedUnits) {
             this.setState(state => ({
                 entryboxContent: this.computeEntryboxContent(this.state.indentedUnits, this.state.entryboxContent)
             }));
             this.props.noteRow.setIndentedUnits(this.state.indentedUnits);
         }
 
-        if (oldState.entryboxContent != this.state.entryboxContent) {
+        if (oldState.entryboxContent !== this.state.entryboxContent) {
             this.props.noteRow.setContent(this.state.entryboxContent);
         }
 
@@ -87,7 +87,7 @@ export class NoteRow extends React.Component<NoteRowProps, NoteRowState> {
             return;
         }
 
-        if (e.key == "Tab") {
+        if (e.key === "Tab") {
             e.preventDefault();
             if (e.shiftKey) {
                 this.setState(state => ({ indentedUnits: Math.max(state.indentedUnits - 1, 0) }));

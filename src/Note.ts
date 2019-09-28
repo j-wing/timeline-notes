@@ -1,7 +1,7 @@
 import { NoteLine } from "./NoteLine";
 
 export class Note {
-  noteLines: Array<NoteLine> = new Array();
+  noteLines: Array<NoteLine> = [];
 
   constructor(private title: string) {}
 
