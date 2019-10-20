@@ -54,6 +54,7 @@ export class NoteRow extends React.Component<NoteRowProps, NoteRowState> {
                     onKeyDown={this.handleKeyDown.bind(this)}
                     onChange={this.handleChange.bind(this)}
                     value={this.state.entryboxContent}
+                    readOnly={!this.props.focused}
                     rows={1}
                     className="entrybox"></textarea>
             </div>
@@ -105,8 +106,6 @@ export class NoteRow extends React.Component<NoteRowProps, NoteRowState> {
         if (this.entryboxElement.current !== null) {
             if (this.props.focused) {
                 this.entryboxElement.current.focus();
-            } else {
-                this.entryboxElement.current.disabled = true;
             }
         }
 
