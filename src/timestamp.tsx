@@ -5,7 +5,7 @@ interface TimestampState {
 }
 
 interface TimestampProps {
-    focused: boolean;
+    shouldTick: boolean;
     initialTimestamp: Date;
 }
 
@@ -36,14 +36,14 @@ export class Timestamp extends React.Component<TimestampProps, TimestampState> {
     }
 
     componentDidMount() {
-        if (this.props.focused) {
+        if (this.props.shouldTick) {
             this.setupTimer();
         }
     }
 
     componentDidUpdate(prevProps: TimestampProps, prevState: TimestampState) {
-        if (prevProps.focused !== this.props.focused) {
-            if (this.props.focused) {
+        if (prevProps.shouldTick !== this.props.shouldTick) {
+            if (this.props.shouldTick) {
                 this.setupTimer();
             } else {
                 window.clearInterval(this.interval);

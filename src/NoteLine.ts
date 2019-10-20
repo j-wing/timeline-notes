@@ -30,12 +30,20 @@ export class NoteLine {
     return this.content;
   }
 
-  setContent(content: string) {
+  setContent(content: string, updateLastEditTime?: boolean) {
     this.content = content;
+
+    if (updateLastEditTime) {
+      this.setEditTimestamp(new Date());
+    }
   }
 
-  getTimestamp(): Date {
+  getLastEditTimestamp(): Date {
     return this.editTimestamp;
+  }
+
+  setEditTimestamp(timestamp: Date) {
+    this.editTimestamp = timestamp;
   }
 
   getIndentedUnits(): number {

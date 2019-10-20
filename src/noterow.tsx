@@ -15,6 +15,7 @@ interface NoteRowProps {
 interface NoteRowState {
     indentedUnits: number;
     entryboxContent: string;
+    editedSinceLastFocus: boolean;
 }
 
 const INDENT_LENGTH = 4;
@@ -38,6 +39,7 @@ export class NoteRow extends React.Component<NoteRowProps, NoteRowState> {
         this.state = {
             indentedUnits: this.noteLine.getIndentedUnits(),
             entryboxContent: this.computeEntryboxContent(this.noteLine.getIndentedUnits(), this.noteLine.getContent()),
+            editedSinceLastFocus: false
         };
     }
 
@@ -45,8 +47,8 @@ export class NoteRow extends React.Component<NoteRowProps, NoteRowState> {
         return (
             <div className={`noterow ${this.props.focused ? 'noterow-focused' : 'noterow-unfocused'}`}>
                 <Timestamp ref={this.timestampElement}
-                    initialTimestamp={this.noteLine.getTimestamp()}
-                    focused={this.props.focused} />
+                    initialTimestamp={this.noteLine.getLastEditTimestamp()}
+                    shouldTick={this.computeTimestampShouldTick()} />
                 <textarea ref={this.entryboxElement}
                     onFocus={this.handleEntryboxFocus.bind(this)}
                     onKeyDown={this.handleKeyDown.bind(this)}
@@ -56,6 +58,19 @@ export class NoteRow extends React.Component<NoteRowProps, NoteRowState> {
                     className="entrybox"></textarea>
             </div>
         )
+    }
+
+    computeTimestampShouldTick() {
+        let isEmpty = (this.state.entryboxContent.trim().length === 0);
+        if (isEmpty && this.props.focused) {
+            return true;
+        }
+        
+        if (!isEmpty && this.state.editedSinceLastFocus) {
+            return true;
+        }
+
+        return false;
     }
 
     computeEntryboxContent(indentedUnits: number, rawContent: string) {
@@ -76,7 +91,12 @@ export class NoteRow extends React.Component<NoteRowProps, NoteRowState> {
         }
 
         if (oldState.entryboxContent !== this.state.entryboxContent) {
-            this.noteLine.setContent(this.state.entryboxContent);
+            this.noteLine.setContent(this.state.entryboxContent, true);
+            NoteContentHandler.updateNote(this.props.note);
+        }
+
+        if (oldProps.focused !== this.props.focused && !this.props.focused) {
+            this.setState({ editedSinceLastFocus: false })
         }
 
     }
@@ -93,7 +113,7 @@ export class NoteRow extends React.Component<NoteRowProps, NoteRowState> {
     }
 
     handleChange(e: React.ChangeEvent) {
-        this.setState({ entryboxContent: (e.target as HTMLTextAreaElement).value });
+        this.setState({ entryboxContent: (e.target as HTMLTextAreaElement).value, editedSinceLastFocus: true });
         NoteContentHandler.updateNote(this.props.note);
     }
 
