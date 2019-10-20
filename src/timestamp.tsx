@@ -36,7 +36,9 @@ export class Timestamp extends React.Component<TimestampProps, TimestampState> {
     }
 
     componentDidMount() {
-        this.setupTimer();
+        if (this.props.focused) {
+            this.setupTimer();
+        }
     }
 
     componentDidUpdate(prevProps: TimestampProps, prevState: TimestampState) {

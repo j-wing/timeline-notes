@@ -1,7 +1,10 @@
 import React from 'react';
+import { Note } from './Note';
+import NoteContentHandler from './NoteContentHandler';
 
 interface NoteTitleProps {
-    initialTitle: string;
+    initialTitle: string
+    note: Note
 }
 
 interface NoteTitleState {
@@ -38,6 +41,7 @@ export class NoteTitle extends React.Component<NoteTitleProps, NoteTitleState> {
         if (e.key=== 'Enter' && this.divRef.current !== null) {
             e.preventDefault();
             this.setState({ title: this.divRef.current.textContent || "", editing: false})
+            NoteContentHandler.updateNote(this.props.note);
         }
     }
 }

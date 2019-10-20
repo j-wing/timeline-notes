@@ -1,11 +1,14 @@
 import React from "react";
 import { Timestamp } from "./timestamp";
 import { NoteLine } from "./NoteLine";
+import { Note } from "./Note";
+import NoteContentHandler from "./NoteContentHandler";
 
 interface NoteRowProps {
     focusHandler: Function;
     keyDownHandler: Function;
-    noteRow: NoteLine;
+    note: Note;
+    rowId: number;
     focused: boolean;
 }
 
@@ -19,20 +22,31 @@ const INDENT_LENGTH = 4;
 export class NoteRow extends React.Component<NoteRowProps, NoteRowState> {
     timestampElement = React.createRef<Timestamp>();
     entryboxElement = React.createRef<HTMLTextAreaElement>();
+    noteLine: NoteLine;
 
     constructor(props: NoteRowProps) {
         super(props);
 
+        let noteLine = props.note.getLine(props.rowId);
+        if (noteLine === undefined) {
+            console.error("Note: ", props.note);
+            throw "Got bad row id. Provided row id: " + props.rowId;
+        }
+
+        this.noteLine = noteLine;
+
         this.state = {
-            indentedUnits: this.props.noteRow.getIndentedUnits(),
-            entryboxContent: this.computeEntryboxContent(this.props.noteRow.getIndentedUnits(), this.props.noteRow.getContent()),
+            indentedUnits: this.noteLine.getIndentedUnits(),
+            entryboxContent: this.computeEntryboxContent(this.noteLine.getIndentedUnits(), this.noteLine.getContent()),
         };
     }
 
     render() {
         return (
             <div className={`noterow ${this.props.focused ? 'noterow-focused' : 'noterow-unfocused'}`}>
-                <Timestamp ref={this.timestampElement} initialTimestamp={this.props.noteRow.getTimestamp()} focused={this.props.focused} />
+                <Timestamp ref={this.timestampElement}
+                    initialTimestamp={this.noteLine.getTimestamp()}
+                    focused={this.props.focused} />
                 <textarea ref={this.entryboxElement}
                     onFocus={this.handleEntryboxFocus.bind(this)}
                     onKeyDown={this.handleKeyDown.bind(this)}
@@ -58,11 +72,11 @@ export class NoteRow extends React.Component<NoteRowProps, NoteRowState> {
             this.setState(state => ({
                 entryboxContent: this.computeEntryboxContent(this.state.indentedUnits, this.state.entryboxContent)
             }));
-            this.props.noteRow.setIndentedUnits(this.state.indentedUnits);
+            this.noteLine.setIndentedUnits(this.state.indentedUnits);
         }
 
         if (oldState.entryboxContent !== this.state.entryboxContent) {
-            this.props.noteRow.setContent(this.state.entryboxContent);
+            this.noteLine.setContent(this.state.entryboxContent);
         }
 
     }
@@ -80,10 +94,11 @@ export class NoteRow extends React.Component<NoteRowProps, NoteRowState> {
 
     handleChange(e: React.ChangeEvent) {
         this.setState({ entryboxContent: (e.target as HTMLTextAreaElement).value });
+        NoteContentHandler.updateNote(this.props.note);
     }
 
     handleKeyDown(e: React.KeyboardEvent) {
-        if (!this.props.keyDownHandler(this.props.noteRow, e)) {
+        if (!this.props.keyDownHandler(this.noteLine, e)) {
             return;
         }
 
@@ -98,7 +113,7 @@ export class NoteRow extends React.Component<NoteRowProps, NoteRowState> {
     }
 
     handleEntryboxFocus(e: React.FocusEvent) {
-        this.props.focusHandler(this.props.noteRow);
+        this.props.focusHandler(this.noteLine);
 
         if (this.state.entryboxContent.trim().length === 0 && this.entryboxElement.current != null) {
             let currentRawLength = this.entryboxElement.current.textLength;

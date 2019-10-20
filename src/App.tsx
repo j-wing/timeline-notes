@@ -4,6 +4,7 @@ import { NoteRow } from './noterow';
 import { NoteLine } from './NoteLine';
 import { NoteTitle } from './notetitle';
 import { Note } from './Note';
+import NoteContentHandler from './NoteContentHandler';
 
 
 interface AppProps {
@@ -20,23 +21,32 @@ class App extends React.Component<AppProps, AppState> {
   constructor(props: AppProps) {
     super(props);
 
-    let note = new Note();
-    let firstNoteLine = note.addLine();
-    this.state = { note: note, focusedNoteRowId: firstNoteLine.id };
+    let note = NoteContentHandler.getLastEditedNote();
+    let firstNoteLineId: number;
+
+    if (note === null) {
+      note = new Note();
+      firstNoteLineId = note.addLine().id;
+    } else {
+      firstNoteLineId = note.getFirstNoteLineId();
+    }
+
+    this.state = { note: note, focusedNoteRowId: firstNoteLineId };
   }
 
   render() {
     let noteRows = this.state.note.getLines().map(noteRow => {
       return (<NoteRow keyDownHandler={this.handleNoteRowKeyDown.bind(this)}
         focusHandler={this.noteRowFocusHandler.bind(this)}
-        noteRow={noteRow}
+        note={this.state.note}
+        rowId={noteRow.id}
         key={noteRow.id}
         focused={noteRow.id === this.state.focusedNoteRowId} />);
     });
 
     return (
       <div className="App" ref={this.wrapperElement}>
-        <NoteTitle initialTitle={this.state.note.getTitle()} />
+        <NoteTitle note={this.state.note} initialTitle={this.state.note.getTitle()} />
         {noteRows}
       </div>
     );
