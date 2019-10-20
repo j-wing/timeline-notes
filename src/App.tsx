@@ -7,11 +7,11 @@ import { Note } from './Note';
 
 
 interface AppProps {
-  note: Note;
 }
+
 interface AppState {
-  notes: Array<NoteLine>
-  focusedNoteId: number
+  focusedNoteRowId: number
+  note: Note
 }
 
 class App extends React.Component<AppProps, AppState> {
@@ -20,22 +20,23 @@ class App extends React.Component<AppProps, AppState> {
   constructor(props: AppProps) {
     super(props);
 
-    let firstNote = new NoteLine(new Date());
-    this.state = { notes: [firstNote], focusedNoteId: firstNote.id };
+    let note = new Note();
+    let firstNoteLine = note.addLine();
+    this.state = { note: note, focusedNoteRowId: firstNoteLine.id };
   }
 
   render() {
-    let noteRows = this.state.notes.map(noteRow => {
+    let noteRows = this.state.note.getLines().map(noteRow => {
       return (<NoteRow keyDownHandler={this.handleNoteRowKeyDown.bind(this)}
         focusHandler={this.noteRowFocusHandler.bind(this)}
         noteRow={noteRow}
         key={noteRow.id}
-        focused={noteRow.id === this.state.focusedNoteId} />);
+        focused={noteRow.id === this.state.focusedNoteRowId} />);
     });
 
     return (
       <div className="App" ref={this.wrapperElement}>
-        <NoteTitle initialTitle={this.props.note.getTitle()} />
+        <NoteTitle initialTitle={this.state.note.getTitle()} />
         {noteRows}
       </div>
     );
@@ -45,11 +46,9 @@ class App extends React.Component<AppProps, AppState> {
     if (e.key === "Enter") {
       e.preventDefault();
       this.setState((props, state) => {
-        let notes = this.state.notes.slice();
-        let newNote = new NoteLine(new Date(), noteRow.getIndentedUnits());
-        notes.push(newNote);
+        let newNote = this.state.note.addLine(noteRow.getIndentedUnits());
 
-        return { notes: notes, focusedNoteId: newNote.id }
+        return { note: this.state.note, focusedNoteRowId: newNote.id }
       });
       return false;
     } else {
@@ -58,7 +57,7 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   noteRowFocusHandler(note: NoteLine) {
-    this.setState({ focusedNoteId: note.id });
+    this.setState({ focusedNoteRowId: note.id });
   }
 }
 
