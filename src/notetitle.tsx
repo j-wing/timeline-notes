@@ -27,10 +27,19 @@ export class NoteTitle extends React.Component<NoteTitleProps, NoteTitleState> {
             ref={this.divRef}
             onClick={this.handleClick.bind(this)}
             contentEditable={true}
-            onKeyDown={this.handleKeyDown.bind(this)}>
+            onKeyDown={this.handleKeyDown.bind(this)}
+            onBlur={this.handleBlur.bind(this)}
+            suppressContentEditableWarning={true}>
                 {this.state.title}
             </div>
         )
+    }
+
+    componentDidUpdate(prevProps: NoteTitleProps, prevState: NoteTitleState) {
+        if (prevState.title !== this.state.title) {
+            this.props.note.setTitle(this.state.title);
+            NoteContentHandler.updateNote(this.props.note);
+        }
     }
 
     handleClick(e: React.MouseEvent) {
@@ -38,10 +47,16 @@ export class NoteTitle extends React.Component<NoteTitleProps, NoteTitleState> {
     }
 
     handleKeyDown(e: React.KeyboardEvent) {
-        if (e.key=== 'Enter' && this.divRef.current !== null) {
+        if (e.key === 'Enter' && this.divRef.current !== null) {
             e.preventDefault();
             this.setState({ title: this.divRef.current.textContent || "", editing: false})
-            NoteContentHandler.updateNote(this.props.note);
+            this.divRef.current.blur();
+        }
+    }
+
+    handleBlur(e: React.FocusEvent) {
+        if (this.divRef.current !== null) {
+            this.divRef.current.textContent = this.state.title;
         }
     }
 }
