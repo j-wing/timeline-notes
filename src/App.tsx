@@ -61,6 +61,25 @@ class App extends React.Component<AppProps, AppState> {
         return { note: this.state.note, focusedNoteRowId: newNote.id }
       });
       return false;
+    } else if (e.key === "Backspace") {
+      // Since we're catching the keydown event, if we don't call preventDefault,
+      // a character will get deleted on the line that gets focus.
+      e.preventDefault();
+
+      let focusedRow = this.state.note.getLine(this.state.focusedNoteRowId);
+      if (focusedRow !== undefined && focusedRow.isEmpty()) {
+        let nextFocusedRowId = this.state.note.getPreviousRowId(this.state.focusedNoteRowId);
+        this.state.note.deleteRow(this.state.focusedNoteRowId);
+
+        if (nextFocusedRowId !== null) {
+          this.setState({ focusedNoteRowId: nextFocusedRowId });
+        } else {
+          console.error("Got a null previous row id relative to: ", this.state.focusedNoteRowId);
+          this.setState({ focusedNoteRowId: this.state.note.getFirstNoteLineId() });
+        }
+
+        NoteContentHandler.updateNote(this.state.note);
+      }
     } else {
       return true;
     }

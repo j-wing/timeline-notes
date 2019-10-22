@@ -99,7 +99,11 @@ export class NoteRow extends React.Component<NoteRowProps, NoteRowState> {
         if (oldProps.focused !== this.props.focused && !this.props.focused) {
             this.setState({ editedSinceLastFocus: false })
         }
-
+        if (this.entryboxElement.current !== null) {
+            if (this.props.focused) {
+                this.entryboxElement.current.focus();
+            }
+        }
     }
 
     componentDidMount() {

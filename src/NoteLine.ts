@@ -54,6 +54,10 @@ export class NoteLine {
     this.indentedUnits = i;
   }
 
+  isEmpty(): boolean {
+    return (this.content.trim().length === 0);
+  }
+
   serialize(): RawNoteLine {
     return {
       id: this.id,

@@ -10,6 +10,10 @@ export interface RawNote {
 
 export class Note {
   noteLines: Map<number, NoteLine> = new Map<number, NoteLine>();
+  // Since new lines can be inserted anywhere in the note, we need
+  // a separate array keeping track of the visual ordering of the rows
+  // in the note relative to each other.
+  noteLineIdsOrdered: Array<number> = [];
   private title: string;
   private creationTime: Date;
 
@@ -30,6 +34,7 @@ export class Note {
   addLine(indentedUnits?: number): NoteLine {
     let noteLine = new NoteLine(new Date(), this, indentedUnits);
     this.noteLines.set(noteLine.id, noteLine);
+    this.noteLineIdsOrdered.push(noteLine.id);
 
     return noteLine;
   }
@@ -54,7 +59,29 @@ export class Note {
     this.title = title;
   }
 
-  private setNoteLines(noteLines: Map<number, NoteLine>) {
+  getPreviousRowId(id: number): number | null {
+    let lineIndex = this.noteLineIdsOrdered.indexOf(id);
+
+    if (lineIndex === -1) {
+      return null;
+    }
+
+    return this.noteLineIdsOrdered[Math.max(0, lineIndex - 1)];
+  }
+
+  deleteRow(id: number) {
+    this.noteLines.delete(id);
+    let idIndex = this.noteLineIdsOrdered.indexOf(id);
+
+    if (idIndex !== -1) {
+      this.noteLineIdsOrdered.splice(idIndex);
+    } else {
+      console.error("Tried to delete non-existent row with ID: ", id, this);
+    }
+  }
+
+  private setNoteLines(orderedNoteLineIds: Array<number>, noteLines: Map<number, NoteLine>) {
+    this.noteLineIdsOrdered = orderedNoteLineIds;
     this.noteLines = noteLines;
   }
 
@@ -62,7 +89,16 @@ export class Note {
     return {
       title: this.title,
       id: this.id,
-      noteLines: Array.from(this.noteLines.values()).map(noteLine => noteLine.serialize())
+      noteLines: this.noteLineIdsOrdered.map(noteLineId => {
+        let noteLine = this.noteLines.get(noteLineId);
+        
+        if (noteLine === undefined) {
+          console.error("Note: ", this);
+          throw "Got undefined note line during serialization.";
+        }
+
+        return noteLine.serialize();
+      })
     }
   }
 
@@ -73,7 +109,7 @@ export class Note {
     let parsedNoteLines = rawNote.noteLines.map(rawNoteLine => NoteLine.deserialize(note, rawNoteLine));
     let noteLineMap = new Map<number, NoteLine>();
     parsedNoteLines.forEach(noteLine => noteLineMap.set(noteLine.id, noteLine));
-    note.setNoteLines(noteLineMap);
+    note.setNoteLines(rawNote.noteLines.map(rawNoteLine => rawNoteLine.id), noteLineMap);
     return note;
   }
 }
