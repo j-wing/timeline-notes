@@ -88,18 +88,15 @@ class App extends React.Component<AppProps, AppState> {
     if (e.key === "Enter") {
       e.preventDefault();
       this.setState((props, state) => {
-        let newNote = this.state.note.addLine(noteRow.getIndentedUnits());
+        let note = this.state.note;
+        let newNote = note.addLine(noteRow.getIndentedUnits());
 
-        return { note: this.state.note, focusedNoteRowId: newNote.id }
+        return { note: note, focusedNoteRowId: newNote.id }
       });
       return false;
     } else if (e.key === "Backspace") {
-      // Since we're catching the keydown event, if we don't call preventDefault,
-      // a character will get deleted on the line that gets focus.
-      e.preventDefault();
-
       let focusedRow = this.state.note.getLine(this.state.focusedNoteRowId);
-      if (focusedRow !== undefined && focusedRow.isEmpty()) {
+      if (focusedRow !== undefined && focusedRow.isEmpty() && this.state.note.getLines().length > 1) {
         let nextFocusedRowId = this.state.note.getPreviousRowId(this.state.focusedNoteRowId);
         this.state.note.deleteRow(this.state.focusedNoteRowId);
 
@@ -111,6 +108,11 @@ class App extends React.Component<AppProps, AppState> {
         }
 
         NoteContentHandler.updateNote(this.state.note);
+
+        // Since we're catching the keydown event, if we don't call preventDefault,
+        // a character will get deleted on the line that gets focus.
+        e.preventDefault();
+
       }
     } else {
       return true;
