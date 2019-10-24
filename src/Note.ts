@@ -6,6 +6,7 @@ export interface RawNote {
   id: number,
   title: string,
   noteLines: Array<RawNoteLine>
+  finished: boolean;
 }
 
 export class Note {
@@ -16,6 +17,7 @@ export class Note {
   noteLineIdsOrdered: Array<number> = [];
   private title: string;
   private creationTime: Date;
+  private finished: boolean = false;
 
   constructor() {
     this.creationTime = new Date();
@@ -59,6 +61,14 @@ export class Note {
     this.title = title;
   }
 
+  getFinished(): boolean {
+    return this.finished;
+  }
+
+  setFinished(finished: boolean) {
+    this.finished = finished;
+  }
+
   getPreviousRowId(id: number): number | null {
     let lineIndex = this.noteLineIdsOrdered.indexOf(id);
 
@@ -89,6 +99,7 @@ export class Note {
     return {
       title: this.title,
       id: this.id,
+      finished: this.finished,
       noteLines: this.noteLineIdsOrdered.map(noteLineId => {
         let noteLine = this.noteLines.get(noteLineId);
         
@@ -105,6 +116,7 @@ export class Note {
   static deserialize(rawNote: RawNote): Note {
     let note = new Note();
     note.setTitle(rawNote.title);
+    note.setFinished(rawNote.finished);
 
     let parsedNoteLines = rawNote.noteLines.map(rawNoteLine => NoteLine.deserialize(note, rawNoteLine));
     let noteLineMap = new Map<number, NoteLine>();

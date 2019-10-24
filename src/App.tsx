@@ -57,7 +57,9 @@ class App extends React.Component<AppProps, AppState> {
       <div className="App" ref={this.wrapperElement}>
         <div className="header">
           <NoteTitle title={this.state.note.getTitle()} titleChangeHandler={this.handleTitleChange.bind(this)} />
-          <Menu newNoteHandler={this.newNoteHandler.bind(this)} />
+          <Menu noteFinished={this.state.note.getFinished()} 
+            newNoteHandler={this.newNoteHandler.bind(this)}
+            finishToggleHandler={this.handleToggleFinished.bind(this)} />
         </div>
         {noteRows}
       </div>
@@ -70,7 +72,14 @@ class App extends React.Component<AppProps, AppState> {
     NoteContentHandler.updateNote(this.state.note);
   }
 
-  newNoteHandler(e: React.MouseEvent) {
+  handleToggleFinished() {
+    let note = this.state.note;
+
+    note.setFinished(!note.getFinished());
+    this.setState({ note: note });
+  }
+
+  newNoteHandler() {
     let note = this.createNewNote();
     this.setState({ note: note, focusedNoteRowId: note.getFirstNoteLineId() });
   }

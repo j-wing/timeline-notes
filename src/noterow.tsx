@@ -62,6 +62,10 @@ export class NoteRow extends React.Component<NoteRowProps, NoteRowState> {
     }
 
     computeTimestampShouldTick() {
+        if (this.props.note.getFinished()) {
+            return false;
+        }
+
         let isEmpty = (this.state.entryboxContent.trim().length === 0);
         if (isEmpty && this.props.focused) {
             return true;
