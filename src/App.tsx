@@ -1,9 +1,11 @@
 import React from 'react';
 import './App.css';
+import 'bootstrap/dist/css/bootstrap.min.css';
 import { NoteRow } from './noterow';
 import { NoteLine } from './NoteLine';
 import { NoteTitle } from './notetitle';
 import { Note } from './Note';
+import { Menu } from './menu';
 import NoteContentHandler from './NoteContentHandler';
 
 
@@ -46,10 +48,17 @@ class App extends React.Component<AppProps, AppState> {
 
     return (
       <div className="App" ref={this.wrapperElement}>
-        <NoteTitle note={this.state.note} initialTitle={this.state.note.getTitle()} />
+        <div className="header">
+          <NoteTitle note={this.state.note} initialTitle={this.state.note.getTitle()} />
+          <Menu clearNoteHandler={this.clearNote.bind(this)} />
+        </div>
         {noteRows}
       </div>
     );
+  }
+
+  clearNote(e: React.MouseEvent) {
+
   }
 
   handleNoteRowKeyDown(noteRow: NoteLine, e: React.KeyboardEvent) {

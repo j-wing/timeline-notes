@@ -22,8 +22,18 @@
   color: #09d3ac;
 }
 
-body {
-  background-color: #ddf3fa;
+body, .root {
+  background-color: #ddf3fa !important;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+}
+
+.dropdown {
+  align-self: center;
+  margin-right: 20px;
 }
 
 .note-title {
@@ -32,7 +42,10 @@ body {
   font-weight: bold;
   padding: 10px;
   padding-bottom: 20px;
+  width: 70%;
 }
+
+
 
 .timestamp {
   padding: 0px 5px;
