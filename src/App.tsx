@@ -27,13 +27,20 @@ class App extends React.Component<AppProps, AppState> {
     let firstNoteLineId: number;
 
     if (note === null) {
-      note = new Note();
-      firstNoteLineId = note.addLine().id;
+      note = this.createNewNote();
+      firstNoteLineId = note.getFirstNoteLineId();
     } else {
       firstNoteLineId = note.getFirstNoteLineId();
     }
 
     this.state = { note: note, focusedNoteRowId: firstNoteLineId };
+  }
+
+  createNewNote(): Note {
+      let note = new Note();
+      note.addLine();
+
+      return note;
   }
 
   render() {
@@ -49,16 +56,23 @@ class App extends React.Component<AppProps, AppState> {
     return (
       <div className="App" ref={this.wrapperElement}>
         <div className="header">
-          <NoteTitle note={this.state.note} initialTitle={this.state.note.getTitle()} />
-          <Menu clearNoteHandler={this.clearNote.bind(this)} />
+          <NoteTitle title={this.state.note.getTitle()} titleChangeHandler={this.handleTitleChange.bind(this)} />
+          <Menu newNoteHandler={this.newNoteHandler.bind(this)} />
         </div>
         {noteRows}
       </div>
     );
   }
 
-  clearNote(e: React.MouseEvent) {
+  handleTitleChange(newTitle: string) {
+    this.state.note.setTitle(newTitle);
+    this.setState({ note: this.state.note });
+    NoteContentHandler.updateNote(this.state.note);
+  }
 
+  newNoteHandler(e: React.MouseEvent) {
+    let note = this.createNewNote();
+    this.setState({ note: note, focusedNoteRowId: note.getFirstNoteLineId() });
   }
 
   handleNoteRowKeyDown(noteRow: NoteLine, e: React.KeyboardEvent) {

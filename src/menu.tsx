@@ -3,7 +3,7 @@ import Dropdown from 'react-bootstrap/Dropdown';
 import DropdownButton from 'react-bootstrap/DropdownButton';
 
 interface MenuProps {
-    clearNoteHandler: (e: React.MouseEvent<any>) => void;
+    newNoteHandler: (e: React.MouseEvent<any>) => void;
 }
 
 interface MenuState {
@@ -20,7 +20,7 @@ export class Menu extends React.Component<MenuProps, MenuState> {
     render() {
         return (
             <DropdownButton alignRight id="menu" title="Menu">
-                <Dropdown.Item onClick={this.props.clearNoteHandler}>New Note</Dropdown.Item>
+                <Dropdown.Item onClick={this.props.newNoteHandler}>New Note</Dropdown.Item>
             </DropdownButton>
         )
     }
