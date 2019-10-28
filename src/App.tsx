@@ -7,7 +7,10 @@ import { NoteTitle } from './notetitle';
 import { Note } from './Note';
 import { Menu } from './menu';
 import NoteContentHandler from './NoteContentHandler';
+import DriveSyncHandler from './DriveSyncHandler';
 
+
+declare var gapi: any;
 
 interface AppProps {
 }
@@ -22,6 +25,8 @@ class App extends React.Component<AppProps, AppState> {
 
   constructor(props: AppProps) {
     super(props);
+
+    DriveSyncHandler.init();
 
     let note = NoteContentHandler.getLastEditedNote();
     let firstNoteLineId: number;
@@ -59,11 +64,21 @@ class App extends React.Component<AppProps, AppState> {
           <NoteTitle title={this.state.note.getTitle()} titleChangeHandler={this.handleTitleChange.bind(this)} />
           <Menu noteFinished={this.state.note.getFinished()} 
             newNoteHandler={this.newNoteHandler.bind(this)}
-            finishToggleHandler={this.handleToggleFinished.bind(this)} />
+            finishToggleHandler={this.handleToggleFinished.bind(this)}
+            signOutHandler={this.signOutHandler.bind(this)}
+            signInHandler={this.signInHandler.bind(this)} />
         </div>
         {noteRows}
       </div>
     );
+  }
+
+  signInHandler() {
+    gapi.auth2.getAuthInstance().signIn();
+  }
+
+  signOutHandler() {
+    gapi.auth2.getAuthInstance().signOut();
   }
 
   handleTitleChange(newTitle: string) {
