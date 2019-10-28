@@ -7,6 +7,7 @@ export interface RawNote {
   title: string,
   noteLines: Array<RawNoteLine>
   finished: boolean;
+  driveId: string;
 }
 
 export class Note {
@@ -18,6 +19,7 @@ export class Note {
   private title: string;
   private creationTime: Date;
   private finished: boolean = false;
+  private driveId: string = "";
 
   constructor() {
     this.creationTime = new Date();
@@ -69,6 +71,24 @@ export class Note {
     this.finished = finished;
   }
 
+  getDriveId(): string {
+    return this.driveId || "";
+  }
+
+  setDriveId(driveId: string) {
+    this.driveId = driveId;
+  }
+
+  convertToText(): string {
+
+    let output = "";
+    this.noteLines.forEach(line => {
+      output += line.convertToText() + "\n";
+    });
+
+    return output;
+  }
+
   getPreviousRowId(id: number): number | null {
     let lineIndex = this.noteLineIdsOrdered.indexOf(id);
 
@@ -100,6 +120,7 @@ export class Note {
       title: this.title,
       id: this.id,
       finished: this.finished,
+      driveId: this.driveId,
       noteLines: this.noteLineIdsOrdered.map(noteLineId => {
         let noteLine = this.noteLines.get(noteLineId);
         
@@ -117,6 +138,7 @@ export class Note {
     let note = new Note();
     note.setTitle(rawNote.title);
     note.setFinished(rawNote.finished);
+    note.setDriveId(rawNote.driveId);
 
     let parsedNoteLines = rawNote.noteLines.map(rawNoteLine => NoteLine.deserialize(note, rawNoteLine));
     let noteLineMap = new Map<number, NoteLine>();

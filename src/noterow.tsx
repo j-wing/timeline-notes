@@ -3,6 +3,7 @@ import { Timestamp } from "./timestamp";
 import { NoteLine } from "./NoteLine";
 import { Note } from "./Note";
 import NoteContentHandler from "./NoteContentHandler";
+import { computeIndentString } from "./util";
 
 interface NoteRowProps {
     focusHandler: Function;
@@ -17,8 +18,6 @@ interface NoteRowState {
     entryboxContent: string;
     editedSinceLastFocus: boolean;
 }
-
-const INDENT_LENGTH = 4;
 
 export class NoteRow extends React.Component<NoteRowProps, NoteRowState> {
     timestampElement = React.createRef<Timestamp>();
@@ -79,11 +78,7 @@ export class NoteRow extends React.Component<NoteRowProps, NoteRowState> {
     }
 
     computeEntryboxContent(indentedUnits: number, rawContent: string) {
-        /*eslint no-array-constructor: "error"*/
-        let indentPrefix = new Array(indentedUnits * INDENT_LENGTH)
-            .fill(" ")
-            .join("");
-        return indentPrefix + rawContent.trim();
+        return computeIndentString(indentedUnits) + rawContent.trim();
     }
 
 

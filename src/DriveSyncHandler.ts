@@ -11,7 +11,11 @@ const DISCOVERY_DOCS = ["https://www.googleapis.com/discovery/v1/apis/drive/v3/r
 // included, separated by spaces.
 const SCOPES = 'https://www.googleapis.com/auth/drive.file';
 
+const DIRECTORY_MIME = "application/vnd.google-apps.folder";
+const DOC_MIME = "application/vnd.google-apps.document";
+
 const PARENT_NAME = "Synced Interview Notes";
+const PARENT_ID_STORAGE_KEY = "parent-drive-id";
 
 export enum DriveSignInState {
     LOADING,
@@ -24,8 +28,8 @@ type SignedInEventHandler = (isSignedIn: DriveSignInState) => void;
 class DriveSyncHandler {
     private signedInEventHandlers: Array<SignedInEventHandler> = [];
 
-    async init() {
-        gapi.load('client:auth2', this.initClient.bind(this));
+    async init(): Promise<void> {
+        return gapi.load('client:auth2', this.initClient.bind(this));
     }
 
     initClient() {
@@ -57,6 +61,66 @@ class DriveSyncHandler {
 
     isUserSignedIn(): boolean {
         return gapi.auth2.getAuthInstance().isSignedIn.get()
+    }
+
+    async saveNote(note: Note): Promise<string> {
+        console.log("Saving note to drive: ", note);
+
+        let id;
+        if (note.getDriveId().length === 0) {
+            let parentId = await this.getParentFolderId();
+
+            let response = await gapi.client.drive.files.create({
+                name: note.getTitle(),
+                mimeType: DOC_MIME,
+                parents: [parentId],
+            })
+
+            console.log("Got create response: ", response);
+
+            if (response.status !== 200) {
+                throw "Got bad create response code";
+            }
+            id = response.result.id;
+        } else {
+            id = note.getDriveId();
+        }
+
+        await this.uploadContent(note.getDriveId(), note.convertToText());
+        return id;
+    }
+
+    async getParentFolderId(): Promise<string> {
+        let id = window.localStorage[PARENT_ID_STORAGE_KEY];
+        if (id === undefined) {
+            let response = await gapi.client.drive.files.create({
+                mimeType: DIRECTORY_MIME,
+                name: PARENT_NAME
+            })
+
+            console.log("got create response: ", response);
+            if (response.status != 200) {
+                throw "Got bad create response code";
+            }
+
+            id = response.result.id;
+            window.localStorage[PARENT_ID_STORAGE_KEY] = id;
+        } else {
+            console.log("Reusing drive id: ", id);
+        }
+        return id;
+    }
+
+    async uploadContent(driveId: string, content: string): Promise<string> {
+        let xhr = new XMLHttpRequest();
+        xhr.open("PATCH", "https://www.googleapis.com/upload/drive/v3/files/" + driveId + "?uploadType=media");
+        xhr.setRequestHeader("Authorization", "Bearer " + gapi.client.getToken().access_token);
+        xhr.setRequestHeader("Content-Type", DOC_MIME);
+
+        return new Promise<string>((resolve, reject) => {
+            xhr.onload = () => resolve();
+            xhr.send(content);
+        });
     }
 }
 

@@ -1,5 +1,8 @@
 import NoteContentHandler from "./NoteContentHandler";
 import { Note } from "./Note";
+import { computeIndentString } from "./util";
+
+export const INDENT_LENGTH = 4;
 
 export interface RawNoteLine {
   content: string,
@@ -56,6 +59,18 @@ export class NoteLine {
 
   isEmpty(): boolean {
     return (this.content.trim().length === 0);
+  }
+
+  convertToText(): string {
+    return this.editTimestamp.toLocaleString("en-us", {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    second: "2-digit",
+                    hour12: false
+                })
+                + " - "
+                + computeIndentString(this.indentedUnits)
+                + this.content;
   }
 
   serialize(): RawNoteLine {

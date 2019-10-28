@@ -7,10 +7,12 @@ import { NoteTitle } from './notetitle';
 import { Note } from './Note';
 import { Menu } from './menu';
 import NoteContentHandler from './NoteContentHandler';
-import DriveSyncHandler from './DriveSyncHandler';
+import DriveSyncHandler, { DriveSignInState } from './DriveSyncHandler';
 
 
-declare var gapi: any;
+declare var gapi: any
+
+const SYNC_TIMEOUT = 2000;
 
 interface AppProps {
 }
@@ -23,9 +25,12 @@ interface AppState {
 class App extends React.Component<AppProps, AppState> {
   wrapperElement = React.createRef<HTMLDivElement>();
 
+  // Initialize to true so that we do a sync on load.
+  private editedSinceLastDriveSync = false;
+  private syncTimer: NodeJS.Timeout | null = null;
+
   constructor(props: AppProps) {
     super(props);
-
     DriveSyncHandler.init();
 
     let note = NoteContentHandler.getLastEditedNote();
@@ -37,7 +42,6 @@ class App extends React.Component<AppProps, AppState> {
     } else {
       firstNoteLineId = note.getFirstNoteLineId();
     }
-
     this.state = { note: note, focusedNoteRowId: firstNoteLineId };
   }
 
@@ -46,6 +50,30 @@ class App extends React.Component<AppProps, AppState> {
       note.addLine();
 
       return note;
+  }
+
+  componentDidMount() {
+    DriveSyncHandler.addSignInStateHandler((state: DriveSignInState) => {
+      if (state !== DriveSignInState.SIGNED_IN) {
+        if (this.syncTimer !== null) {
+          clearTimeout(this.syncTimer);
+          this.syncTimer = null;
+        }
+        return;
+      }
+
+      DriveSyncHandler.saveNote(this.state.note);
+      this.syncTimer = setInterval(async () => {
+        if (this.editedSinceLastDriveSync) {
+          let id = await DriveSyncHandler.saveNote(this.state.note);
+          let note = this.state.note;
+          note.setDriveId(id);
+          this.editedSinceLastDriveSync = false;
+
+          this.setState({ note: note})
+        }
+      }, SYNC_TIMEOUT);
+    });
   }
 
   render() {
@@ -100,6 +128,8 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   handleNoteRowKeyDown(noteRow: NoteLine, e: React.KeyboardEvent) {
+    this.editedSinceLastDriveSync = true;
+
     if (e.key === "Enter") {
       e.preventDefault();
       this.setState((props, state) => {
@@ -132,14 +162,12 @@ class App extends React.Component<AppProps, AppState> {
     } else {
       return true;
     }
+
   }
 
   noteRowFocusHandler(note: NoteLine) {
     this.setState({ focusedNoteRowId: note.id });
   }
 }
-
-
-
 
 export default App;
