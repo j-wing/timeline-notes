@@ -1,4 +1,3 @@
-import NoteContentHandler from "./NoteContentHandler";
 import { Note } from "./Note";
 import { computeIndentString } from "./util";
 

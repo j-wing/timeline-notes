@@ -79,7 +79,7 @@ class DriveSyncHandler {
             console.log("Got create response: ", response);
 
             if (response.status !== 200) {
-                throw "Got bad create response code";
+                throw new Error("Got bad create response code");
             }
             id = response.result.id;
         } else {
@@ -99,8 +99,8 @@ class DriveSyncHandler {
             })
 
             console.log("got create response: ", response);
-            if (response.status != 200) {
-                throw "Got bad create response code";
+            if (response.status !== 200) {
+                throw new Error("Got bad create response code");
             }
 
             id = response.result.id;
@@ -123,5 +123,6 @@ class DriveSyncHandler {
         });
     }
 }
+
 
 export default new DriveSyncHandler();

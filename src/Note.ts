@@ -1,7 +1,5 @@
 import { RawNoteLine, NoteLine } from "./NoteLine";
 
-import NoteContentHandler from "./NoteContentHandler";
-
 export interface RawNote {
   id: number,
   title: string,
@@ -126,7 +124,7 @@ export class Note {
         
         if (noteLine === undefined) {
           console.error("Note: ", this);
-          throw "Got undefined note line during serialization.";
+          throw new Error("Got undefined note line during serialization.");
         }
 
         return noteLine.serialize();

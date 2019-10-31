@@ -1,6 +1,4 @@
 import React from 'react';
-import { Note } from './Note';
-import NoteContentHandler from './NoteContentHandler';
 
 interface NoteTitleProps {
     title: string;

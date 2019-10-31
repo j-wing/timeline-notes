@@ -2,8 +2,6 @@ import { Note } from "./Note";
 
 const LAST_EDIT_KEY = 'lastEditedNote';
 class LocalStore {
-    constructor() {
-    }
 
     saveNote(note: Note) {
         let id = this.getNoteStorageId(note);

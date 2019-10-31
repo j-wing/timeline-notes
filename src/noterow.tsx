@@ -30,7 +30,7 @@ export class NoteRow extends React.Component<NoteRowProps, NoteRowState> {
         let noteLine = props.note.getLine(props.rowId);
         if (noteLine === undefined) {
             console.error("Note: ", props.note);
-            throw "Got bad row id. Provided row id: " + props.rowId;
+            throw new Error("Got bad row id. Provided row id: " + props.rowId);
         }
 
         this.noteLine = noteLine;
@@ -111,7 +111,6 @@ export class NoteRow extends React.Component<NoteRowProps, NoteRowState> {
                 this.entryboxElement.current.focus();
             }
         }
-
     }
 
     handleChange(e: React.ChangeEvent) {
