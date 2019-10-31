@@ -22,6 +22,27 @@ interface AppState {
   note: Note
 }
 
+interface ViewInDocsLinkProps {
+  noteDriveId: string;
+}
+
+interface ViewInDocsLinkState {
+}
+
+class ViewInDocsLink extends React.Component<ViewInDocsLinkProps, ViewInDocsLinkState> {
+  render() {
+    return (
+      <div className="view-in-docs-link" >
+        {this.props.noteDriveId.length > 0 && 
+            <a href={"https://docs.google.com/document/d/" + this.props.noteDriveId + "/edit"}
+          target="_blank">
+            View Note in Docs
+          </a>}
+      </div>
+    )
+  }
+}
+
 class App extends React.Component<AppProps, AppState> {
   wrapperElement = React.createRef<HTMLDivElement>();
 
@@ -90,6 +111,7 @@ class App extends React.Component<AppProps, AppState> {
       <div className="App" ref={this.wrapperElement}>
         <div className="header">
           <NoteTitle title={this.state.note.getTitle()} titleChangeHandler={this.handleTitleChange.bind(this)} />
+          <ViewInDocsLink noteDriveId={this.state.note.getDriveId()} />
           <Menu noteFinished={this.state.note.getFinished()} 
             newNoteHandler={this.newNoteHandler.bind(this)}
             finishToggleHandler={this.handleToggleFinished.bind(this)}

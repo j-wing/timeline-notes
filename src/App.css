@@ -42,10 +42,18 @@ body, .root {
   font-weight: bold;
   padding: 10px;
   padding-bottom: 20px;
-  width: 70%;
+  width: 30%;
 }
 
+.view-in-docs-link {
+  display: flex;
+  align-self: center;
+}
 
+.view-in-docs-link a {
+  color: black !important;
+  font-weight: bold;
+}
 
 .timestamp {
   padding: 0px 5px;
