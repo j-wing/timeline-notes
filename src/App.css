@@ -28,11 +28,11 @@ body, .root {
 
 .header {
   display: flex;
-  justify-content: space-between;
 }
 
 .dropdown {
   align-self: center;
+  margin-left: auto;
   margin-right: 20px;
 }
 
@@ -40,9 +40,17 @@ body, .root {
   font-size: 150%;
   text-align: left;
   font-weight: bold;
-  padding: 10px;
-  padding-bottom: 20px;
-  width: 30%;
+  margin: 7px;
+  margin-bottom: 17px;
+  padding: 3px;
+  padding-right: 6px;
+}
+
+.note-title:hover {
+  border: 1px solid lightgray;
+  margin: 6px;
+  margin-bottom: 16px;
+  border-radius: 1px;
 }
 
 .view-in-docs-link {
