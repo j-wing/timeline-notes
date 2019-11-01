@@ -46,7 +46,6 @@ class ViewInDocsLink extends React.Component<ViewInDocsLinkProps, ViewInDocsLink
 class App extends React.Component<AppProps, AppState> {
   wrapperElement = React.createRef<HTMLDivElement>();
 
-  // Initialize to true so that we do a sync on load.
   private editedSinceLastDriveSync = false;
   private syncTimer: NodeJS.Timeout | null = null;
 
@@ -83,18 +82,24 @@ class App extends React.Component<AppProps, AppState> {
         return;
       }
 
-      DriveSyncHandler.saveNote(this.state.note);
-      this.syncTimer = setInterval(async () => {
-        if (this.editedSinceLastDriveSync) {
-          let id = await DriveSyncHandler.saveNote(this.state.note);
-          let note = this.state.note;
-          note.setDriveId(id);
-          this.editedSinceLastDriveSync = false;
-
-          this.setState({ note: note})
-        }
-      }, SYNC_TIMEOUT);
+      DriveSyncHandler.saveNote(this.state.note).then(() => {
+        setTimeout(this.syncTimerHandler.bind(this), SYNC_TIMEOUT);
+      });
     });
+  }
+
+  async syncTimerHandler() {
+    if (this.editedSinceLastDriveSync) {
+      let id = await DriveSyncHandler.saveNote(this.state.note);
+      if (id.length > 0) {
+        let note = this.state.note;
+        note.setDriveId(id);
+        this.setState({ note: note })
+      }
+      this.editedSinceLastDriveSync = false;
+    }
+
+    this.syncTimer = setTimeout(this.syncTimerHandler.bind(this), SYNC_TIMEOUT);
   }
 
   render() {

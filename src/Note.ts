@@ -77,6 +77,16 @@ export class Note {
     this.driveId = driveId;
   }
 
+  isEmpty(): boolean {
+    for (let line of this.noteLines.values()) {
+      if (!line.isEmpty()) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
   convertToText(): string {
 
     let output = "";

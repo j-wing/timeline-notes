@@ -64,10 +64,9 @@ class DriveSyncHandler {
     }
 
     async saveNote(note: Note): Promise<string> {
-        console.log("Saving note to drive: ", note);
-
-        let id;
-        if (note.getDriveId().length === 0) {
+        let id = "";
+        if (note.getDriveId().length === 0 && !note.isEmpty()) {
+            console.log("Creating new note to drive: ", note);
             let parentId = await this.getParentFolderId();
 
             let response = await gapi.client.drive.files.create({
@@ -82,17 +81,21 @@ class DriveSyncHandler {
                 throw new Error("Got bad create response code");
             }
             id = response.result.id;
-        } else {
+        } else if (note.getDriveId().length !== 0) {
+            console.log("Saving note to drive: ", note);
             id = note.getDriveId();
         }
 
-        await this.uploadContent(note.getDriveId(), note.convertToText());
+        if (id.length > 0) {
+            await this.uploadContent(note.getDriveId(), note.convertToText());
+        }
         return id;
     }
 
     async getParentFolderId(): Promise<string> {
         let id = window.localStorage[PARENT_ID_STORAGE_KEY];
         if (id === undefined) {
+            console.log("Creating new parent folder...");
             let response = await gapi.client.drive.files.create({
                 mimeType: DIRECTORY_MIME,
                 name: PARENT_NAME
@@ -112,6 +115,7 @@ class DriveSyncHandler {
     }
 
     async uploadContent(driveId: string, content: string): Promise<string> {
+        console.log("About to upload content for", driveId);
         let xhr = new XMLHttpRequest();
         xhr.open("PATCH", "https://www.googleapis.com/upload/drive/v3/files/" + driveId + "?uploadType=media");
         xhr.setRequestHeader("Authorization", "Bearer " + gapi.client.getToken().access_token);
