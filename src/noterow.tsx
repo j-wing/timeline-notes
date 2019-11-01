@@ -4,6 +4,8 @@ import { NoteLine } from "./NoteLine";
 import { Note } from "./Note";
 import NoteContentHandler from "./NoteContentHandler";
 import { computeIndentString } from "./util";
+import TextareaAutosize from 'react-textarea-autosize';
+
 
 interface NoteRowProps {
     focusHandler: Function;
@@ -48,14 +50,13 @@ export class NoteRow extends React.Component<NoteRowProps, NoteRowState> {
                 <Timestamp ref={this.timestampElement}
                     initialTimestamp={this.noteLine.getLastEditTimestamp()}
                     shouldTick={this.computeTimestampShouldTick()} />
-                <textarea ref={this.entryboxElement}
+                <TextareaAutosize inputRef={this.entryboxElement}
                     onFocus={this.handleEntryboxFocus.bind(this)}
                     onKeyDown={this.handleKeyDown.bind(this)}
                     onChange={this.handleChange.bind(this)}
                     value={this.state.entryboxContent}
                     readOnly={!this.props.focused}
-                    rows={1}
-                    className="entrybox"></textarea>
+                    className="entrybox" />
             </div>
         )
     }

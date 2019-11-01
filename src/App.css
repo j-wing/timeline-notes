@@ -78,6 +78,7 @@ body, .root {
   height: fit-content;
   font-size: 120%;
   background-color: #ddf3fa;
+  overflow: hidden;
 }
 
 .noterow-unfocused .entrybox {
