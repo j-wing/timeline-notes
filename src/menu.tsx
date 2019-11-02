@@ -46,6 +46,12 @@ export class Menu extends React.Component<MenuProps, MenuState> {
                     Sign into Google Drive
                 </Dropdown.Item>
             ];
+        } else {
+            driveMenuItems = [
+                <Dropdown.Item key="loading" onClick={(e: React.MouseEvent<any>) => this.props.signInHandler()}>
+                    Drive Login Loading...
+                </Dropdown.Item>
+            ];
         }
 
         
