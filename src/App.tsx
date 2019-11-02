@@ -53,6 +53,7 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   componentDidMount() {
+    this.updateWindowTitle();
     DriveSyncHandler.addSignInStateHandler((state: DriveSignInState) => {
       if (state !== DriveSignInState.SIGNED_IN) {
         if (this.syncTimer !== null) {
@@ -66,6 +67,13 @@ class App extends React.Component<AppProps, AppState> {
         setTimeout(this.syncTimerHandler.bind(this), SYNC_TIMEOUT);
       });
     });
+  }
+
+  componentDidUpdate(oldProps: AppProps, oldState: AppState) {
+    if (oldState.note.getTitle() !== this.state.note.getTitle()) {
+      this.updateWindowTitle();      
+    }
+
   }
 
   async syncTimerHandler() {
@@ -121,6 +129,10 @@ class App extends React.Component<AppProps, AppState> {
     this.state.note.setTitle(newTitle);
     this.setState({ note: this.state.note });
     NoteContentHandler.updateNote(this.state.note);
+  }
+
+  updateWindowTitle() {
+    document.title = this.state.note.getTitle() + " - Interview Notes";
   }
 
   handleToggleTimestampsLocked() {
