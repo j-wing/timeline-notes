@@ -8,6 +8,7 @@ import { Note } from './Note';
 import { Menu } from './menu';
 import NoteContentHandler from './NoteContentHandler';
 import DriveSyncHandler, { DriveSignInState } from './DriveSyncHandler';
+import StatusArea from './statusarea';
 
 
 declare var gapi: any
@@ -20,27 +21,6 @@ interface AppProps {
 interface AppState {
   focusedNoteRowId: number
   note: Note
-}
-
-interface ViewInDocsLinkProps {
-  noteDriveId: string;
-}
-
-interface ViewInDocsLinkState {
-}
-
-class ViewInDocsLink extends React.Component<ViewInDocsLinkProps, ViewInDocsLinkState> {
-  render() {
-    return (
-      <div className="view-in-docs-link" >
-        {this.props.noteDriveId.length > 0 && 
-            <a href={"https://docs.google.com/document/d/" + this.props.noteDriveId + "/edit"}
-          target="_blank">
-            View Note in Docs
-          </a>}
-      </div>
-    )
-  }
 }
 
 class App extends React.Component<AppProps, AppState> {
@@ -116,7 +96,7 @@ class App extends React.Component<AppProps, AppState> {
       <div className="App" ref={this.wrapperElement}>
         <div className="header">
           <NoteTitle title={this.state.note.getTitle()} titleChangeHandler={this.handleTitleChange.bind(this)} />
-          <ViewInDocsLink noteDriveId={this.state.note.getDriveId()} />
+          <StatusArea noteDriveId={this.state.note.getDriveId()} timestampsLocked={this.state.note.getTimestampsLocked()} />
           <Menu timestampsLocked={this.state.note.getTimestampsLocked()} 
             newNoteHandler={this.newNoteHandler.bind(this)}
             timestampLockToggleHandler={this.handleToggleTimestampsLocked.bind(this)}

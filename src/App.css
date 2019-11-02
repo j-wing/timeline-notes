@@ -102,3 +102,16 @@ body, .root {
 .noterow-unfocused {
   color: gray;
 }
+
+.status-area {
+  display: flex;
+  flex-direction: column;
+}
+
+.status-area .note-locked-icon {
+  display: inline-block;
+  background-image: url(./lock_outline_black_18x18.png);
+  width: 18px;
+  height: 18px;
+  margin-top: 5px;
+}
