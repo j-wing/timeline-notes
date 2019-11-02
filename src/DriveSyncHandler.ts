@@ -23,12 +23,22 @@ export enum DriveSignInState {
     SIGNED_IN
 }
 
+export enum DriveSyncStatus {
+    LOADING,
+    SIGNED_OUT,
+    SYNCING,
+    SYNCED
+}
+
 type SignedInEventHandler = (isSignedIn: DriveSignInState) => void;
+type SyncStatusChangeHandler = (isSignedIn: DriveSyncStatus) => void;
 
 class DriveSyncHandler {
     private signedInEventHandlers: Array<SignedInEventHandler> = [];
+    private syncStatusChangeHandlers: Array<SyncStatusChangeHandler> = [];
 
     async init(): Promise<void> {
+        this.fireSyncStatusChange(DriveSyncStatus.LOADING);
         return gapi.load('client:auth2', this.initClient.bind(this));
     }
 
@@ -49,6 +59,10 @@ class DriveSyncHandler {
     handleIsSignedInState(isSignedIn: boolean) {
         console.log('user is now', isSignedIn);
 
+        if (!isSignedIn) {
+            this.fireSyncStatusChange(DriveSyncStatus.SIGNED_OUT);
+        }
+
         let signInState = (isSignedIn) ? DriveSignInState.SIGNED_IN : DriveSignInState.SIGNED_OUT;
         for (let handler of this.signedInEventHandlers) {
             handler(signInState);
@@ -59,11 +73,22 @@ class DriveSyncHandler {
         this.signedInEventHandlers.push(handler);
     }
 
+    addSyncStatusChangeHandler(handler: SyncStatusChangeHandler) {
+        this.syncStatusChangeHandlers.push(handler);
+    }
+    
+    fireSyncStatusChange(newStatus: DriveSyncStatus) {
+        for (let handler of this.syncStatusChangeHandlers) {
+            handler(newStatus);
+        }
+    }
+
     isUserSignedIn(): boolean {
         return gapi.auth2.getAuthInstance().isSignedIn.get()
     }
 
     async saveNote(note: Note): Promise<string> {
+        this.fireSyncStatusChange(DriveSyncStatus.SYNCING);
         let id = "";
         if (note.getDriveId().length === 0 && !note.isEmpty()) {
             console.log("Creating new note to drive: ", note);
@@ -89,6 +114,8 @@ class DriveSyncHandler {
         if (id.length > 0) {
             await this.uploadContent(note.getDriveId(), note.convertToText());
         }
+
+        this.fireSyncStatusChange(DriveSyncStatus.SYNCED);
         return id;
     }
 

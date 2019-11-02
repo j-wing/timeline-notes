@@ -1,21 +1,59 @@
 import React from "react";
+import DriveSyncHandler, { DriveSyncStatus } from "./DriveSyncHandler";
 
 interface SyncStatusAreaProps {
   noteDriveId: string;
 }
 
 interface SyncStatusAreaState {
+    syncStatus: DriveSyncStatus;
 }
 
 class SyncStatusArea extends React.Component<SyncStatusAreaProps, SyncStatusAreaState> {
+    constructor(props: SyncStatusAreaProps) {
+        super(props);
+
+        DriveSyncHandler.addSyncStatusChangeHandler(this.handleSyncStatusChange.bind(this));
+        this.state = {syncStatus: DriveSyncStatus.LOADING };
+    }
+
+    handleSyncStatusChange(newStatus: DriveSyncStatus) {
+        this.setState({ syncStatus: newStatus });
+    }
+
   render() {
+      let className = "";
+      let text = "";
+
+      switch (this.state.syncStatus) {
+          case DriveSyncStatus.SYNCING:
+              className = "syncing";
+              break;
+          case DriveSyncStatus.SYNCED:
+              className = "synced";
+              break;
+          case DriveSyncStatus.LOADING:
+              className = "loading";
+              text = "Loading Drive state..."
+              break;
+          case DriveSyncStatus.SIGNED_OUT:
+              className = "signed-out";
+              text = "Not signed into Drive"
+              break;
+      }
+
+      let showDocsLink = (this.props.noteDriveId.length > 0 && 
+                            (this.state.syncStatus === DriveSyncStatus.SYNCED ||
+                             this.state.syncStatus === DriveSyncStatus.SYNCING));
     return (
-      <div className="view-in-docs-link" >
-        {this.props.noteDriveId.length > 0 && 
-            <a href={"https://docs.google.com/document/d/" + this.props.noteDriveId + "/edit"}
-          target="_blank">
-            View Note in Docs
+      <div className={"view-in-docs-link " + className}>
+        {showDocsLink && 
+                <a href={"https://docs.google.com/document/d/" + this.props.noteDriveId + "/edit"}
+                    rel="noopener noreferrer"
+                    target="_blank">
+            View Note in Drive
           </a>}
+          {text}
       </div>
     )
   }
@@ -49,8 +87,8 @@ interface StatusAreaState {}
 export default class StatusArea extends React.Component<StatusAreaProps, StatusAreaState> {
     render() {
         return <div className="status-area">
-            <LockIcon noteLocked={this.props.timestampsLocked} />
             <SyncStatusArea noteDriveId={this.props.noteDriveId} />
+            <LockIcon noteLocked={this.props.timestampsLocked} />
         </div>
 
     }

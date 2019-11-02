@@ -96,7 +96,8 @@ class App extends React.Component<AppProps, AppState> {
       <div className="App" ref={this.wrapperElement}>
         <div className="header">
           <NoteTitle title={this.state.note.getTitle()} titleChangeHandler={this.handleTitleChange.bind(this)} />
-          <StatusArea noteDriveId={this.state.note.getDriveId()} timestampsLocked={this.state.note.getTimestampsLocked()} />
+          <StatusArea noteDriveId={this.state.note.getDriveId()}
+                      timestampsLocked={this.state.note.getTimestampsLocked()} />
           <Menu timestampsLocked={this.state.note.getTimestampsLocked()} 
             newNoteHandler={this.newNoteHandler.bind(this)}
             timestampLockToggleHandler={this.handleToggleTimestampsLocked.bind(this)}

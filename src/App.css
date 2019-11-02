@@ -53,16 +53,6 @@ body, .root {
   border-radius: 1px;
 }
 
-.view-in-docs-link {
-  display: flex;
-  align-self: center;
-}
-
-.view-in-docs-link a {
-  color: black !important;
-  font-weight: bold;
-}
-
 .timestamp {
   padding: 0px 5px;
   border-right: 2px solid black;
@@ -113,5 +103,30 @@ body, .root {
   background-image: url(./lock_outline_black_18x18.png);
   width: 18px;
   height: 18px;
+}
+
+.status-area .view-in-docs-link {
+  display: flex;
+  align-self: center;
+  padding-left: 22px;
+  background-repeat: no-repeat;
+  background-position: left;
   margin-top: 5px;
+}
+
+.status-area .view-in-docs-link a {
+  color: black !important;
+  font-weight: bold;
+}
+
+.status-area .view-in-docs-link.syncing {
+  background-image: url(./sync_black_18x18.png);
+}
+
+.status-area .view-in-docs-link.synced {
+  background-image: url(./check_circle_black_18x18.png);
+}
+
+.status-area .view-in-docs-link.signed-out {
+  background-image: url(./report_problem_black_18x18.png);
 }
