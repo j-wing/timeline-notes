@@ -28,17 +28,19 @@ class SyncStatusArea extends React.Component<SyncStatusAreaProps, SyncStatusArea
       switch (this.state.syncStatus) {
           case DriveSyncStatus.SYNCING:
               className = "syncing";
+              text = "Syncing note to Drive...";
               break;
           case DriveSyncStatus.SYNCED:
               className = "synced";
+              text = "Add content to sync note...";
               break;
           case DriveSyncStatus.LOADING:
               className = "loading";
-              text = "Loading Drive state..."
+              text = "Loading Drive state...";
               break;
           case DriveSyncStatus.SIGNED_OUT:
               className = "signed-out";
-              text = "Not signed into Drive"
+              text = "Not signed into Drive";
               break;
       }
 
@@ -53,7 +55,7 @@ class SyncStatusArea extends React.Component<SyncStatusAreaProps, SyncStatusArea
                     target="_blank">
             View Note in Drive
           </a>}
-          {text}
+          {!showDocsLink && text}
       </div>
     )
   }

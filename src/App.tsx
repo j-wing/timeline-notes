@@ -144,6 +144,8 @@ class App extends React.Component<AppProps, AppState> {
 
   newNoteHandler() {
     let note = this.createNewNote();
+    // Set this to true so that a sync happens immediately.
+    this.editedSinceLastDriveSync = true;
     this.setState({ note: note, focusedNoteRowId: note.getFirstNoteLineId() });
   }
 

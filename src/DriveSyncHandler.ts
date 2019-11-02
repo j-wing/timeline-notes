@@ -112,10 +112,10 @@ class DriveSyncHandler {
         }
 
         if (id.length > 0) {
-            await this.uploadContent(note.getDriveId(), note.convertToText());
+            await this.uploadContent(id, note.convertToText());
         }
-
         this.fireSyncStatusChange(DriveSyncStatus.SYNCED);
+
         return id;
     }
 

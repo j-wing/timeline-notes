@@ -108,6 +108,8 @@ body, .root {
 .status-area .view-in-docs-link {
   display: flex;
   align-self: center;
+  min-width: 18px;
+  min-height:18px;
   padding-left: 22px;
   background-repeat: no-repeat;
   background-position: left;
