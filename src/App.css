@@ -100,7 +100,7 @@ body, .root {
 
 .status-area .note-locked-icon {
   display: inline-block;
-  background-image: url(./lock_outline_black_18x18.png);
+  background-image: url(./images/lock_outline_black_18x18.png);
   width: 18px;
   height: 18px;
 }
@@ -120,13 +120,17 @@ body, .root {
 }
 
 .status-area .view-in-docs-link.syncing {
-  background-image: url(./sync_black_18x18.png);
+  background-image: url(./images/sync_black_18x18.png);
 }
 
 .status-area .view-in-docs-link.synced {
-  background-image: url(./check_circle_black_18x18.png);
+  background-image: url(./images/check_circle_black_18x18.png);
 }
 
 .status-area .view-in-docs-link.signed-out {
-  background-image: url(./report_problem_black_18x18.png);
+  background-image: url(./images/report_problem_black_18x18.png);
+}
+
+.status-area .view-in-docs-link.loading {
+  background-image: url(./images/hourglass_empty_black_18x18.png);
 }
