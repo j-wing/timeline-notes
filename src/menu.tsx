@@ -6,10 +6,10 @@ import DriveSyncHandler from './DriveSyncHandler';
 
 interface MenuProps {
     newNoteHandler: () => void;
-    finishToggleHandler: () => void;
+    timestampLockToggleHandler: () => void;
     signInHandler: () => void;
     signOutHandler: () => void;
-    noteFinished: boolean;
+    timestampsLocked: boolean;
 }
 
 interface MenuState {
@@ -28,9 +28,9 @@ export class Menu extends React.Component<MenuProps, MenuState> {
     }
 
     render() {
-        let toggleFinishString = (this.props.noteFinished)
-                        ? "Mark Note Unfinished"
-                        : "Mark Note Finished";
+        let toggleTimestampsString = (this.props.timestampsLocked)
+                        ? "Unlock Timestamps"
+                        : "Lock Timestamps";
         
         let driveMenuItems: Array<any> = [];
 
@@ -52,8 +52,8 @@ export class Menu extends React.Component<MenuProps, MenuState> {
         return (
             <DropdownButton alignRight id="menu" title="Menu">
                 <Dropdown.Item onClick={(e: React.MouseEvent<any>) => this.props.newNoteHandler()}>New Note</Dropdown.Item>
-                <Dropdown.Item onClick={(e: React.MouseEvent<any>) => this.props.finishToggleHandler()}>
-                    {toggleFinishString}
+                <Dropdown.Item onClick={(e: React.MouseEvent<any>) => this.props.timestampLockToggleHandler()}>
+                    {toggleTimestampsString}
                 </Dropdown.Item>
                 <Dropdown.Divider />
                 {driveMenuItems}

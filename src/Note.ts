@@ -4,7 +4,7 @@ export interface RawNote {
   id: number,
   title: string,
   noteLines: Array<RawNoteLine>
-  finished: boolean;
+  timestampsLocked: boolean;
   driveId: string;
 }
 
@@ -16,7 +16,7 @@ export class Note {
   noteLineIdsOrdered: Array<number> = [];
   private title: string;
   private creationTime: Date;
-  private finished: boolean = false;
+  private timestampsLocked: boolean = false;
   private driveId: string = "";
 
   constructor() {
@@ -61,12 +61,12 @@ export class Note {
     this.title = title;
   }
 
-  getFinished(): boolean {
-    return this.finished;
+  getTimestampsLocked(): boolean {
+    return this.timestampsLocked;
   }
 
-  setFinished(finished: boolean) {
-    this.finished = finished;
+  setTimestampsLocked(locked: boolean) {
+    this.timestampsLocked = locked;
   }
 
   getDriveId(): string {
@@ -127,7 +127,7 @@ export class Note {
     return {
       title: this.title,
       id: this.id,
-      finished: this.finished,
+      timestampsLocked: this.timestampsLocked,
       driveId: this.driveId,
       noteLines: this.noteLineIdsOrdered.map(noteLineId => {
         let noteLine = this.noteLines.get(noteLineId);
@@ -145,7 +145,7 @@ export class Note {
   static deserialize(rawNote: RawNote): Note {
     let note = new Note();
     note.setTitle(rawNote.title);
-    note.setFinished(rawNote.finished);
+    note.setTimestampsLocked(rawNote.timestampsLocked);
     note.setDriveId(rawNote.driveId);
 
     let parsedNoteLines = rawNote.noteLines.map(rawNoteLine => NoteLine.deserialize(note, rawNoteLine));

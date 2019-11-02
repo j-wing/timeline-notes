@@ -117,9 +117,9 @@ class App extends React.Component<AppProps, AppState> {
         <div className="header">
           <NoteTitle title={this.state.note.getTitle()} titleChangeHandler={this.handleTitleChange.bind(this)} />
           <ViewInDocsLink noteDriveId={this.state.note.getDriveId()} />
-          <Menu noteFinished={this.state.note.getFinished()} 
+          <Menu timestampsLocked={this.state.note.getTimestampsLocked()} 
             newNoteHandler={this.newNoteHandler.bind(this)}
-            finishToggleHandler={this.handleToggleFinished.bind(this)}
+            timestampLockToggleHandler={this.handleToggleTimestampsLocked.bind(this)}
             signOutHandler={this.signOutHandler.bind(this)}
             signInHandler={this.signInHandler.bind(this)} />
         </div>
@@ -142,10 +142,10 @@ class App extends React.Component<AppProps, AppState> {
     NoteContentHandler.updateNote(this.state.note);
   }
 
-  handleToggleFinished() {
+  handleToggleTimestampsLocked() {
     let note = this.state.note;
 
-    note.setFinished(!note.getFinished());
+    note.setTimestampsLocked(!note.getTimestampsLocked());
     this.setState({ note: note });
   }
 

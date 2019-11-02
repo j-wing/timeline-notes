@@ -62,7 +62,7 @@ export class NoteRow extends React.Component<NoteRowProps, NoteRowState> {
     }
 
     computeTimestampShouldTick() {
-        if (this.props.note.getFinished()) {
+        if (this.props.note.getTimestampsLocked()) {
             return false;
         }
 
