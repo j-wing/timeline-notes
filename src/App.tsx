@@ -63,7 +63,13 @@ class App extends React.Component<AppProps, AppState> {
         return;
       }
 
-      DriveSyncHandler.saveNote(this.state.note).then(() => {
+      DriveSyncHandler.saveNote(this.state.note).then(noteId => {
+        let note = this.state.note;
+        if (noteId.length > 0) {
+          note.setDriveId(noteId);
+          this.setState({ note: note });
+        }
+
         setTimeout(this.syncTimerHandler.bind(this), SYNC_TIMEOUT);
       });
     });
