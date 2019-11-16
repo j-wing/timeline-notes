@@ -88,6 +88,10 @@ class DriveSyncHandler {
     }
 
     async saveNote(note: Note): Promise<string> {
+        if (!this.isUserSignedIn()) {
+            return "";
+        }
+
         this.fireSyncStatusChange(DriveSyncStatus.SYNCING);
         let id = "";
         if (note.getDriveId().length === 0 && !note.isEmpty()) {

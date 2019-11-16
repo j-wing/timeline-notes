@@ -187,6 +187,9 @@ class App extends React.Component<AppProps, AppState> {
         e.preventDefault();
 
       }
+    } else if (e.key === "s" && e.ctrlKey) {
+      DriveSyncHandler.saveNote(this.state.note);
+      e.preventDefault();
     } else {
       return true;
     }
