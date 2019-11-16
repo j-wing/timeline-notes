@@ -201,6 +201,18 @@ class App extends React.Component<AppProps, AppState> {
       // Ctrl+S muscle memory to use it.
       DriveSyncHandler.saveNote(this.state.note);
       e.preventDefault();
+    } else if (e.key === "ArrowUp") {
+      let nextFocusedRowId = this.state.note.getPreviousRowId(this.state.focusedNoteRowId);
+
+      if (nextFocusedRowId !== null) {
+        this.setState({ focusedNoteRowId: nextFocusedRowId });
+      }
+    } else if (e.key === "ArrowDown") {
+      let nextFocusedRowId = this.state.note.getNextRowId(this.state.focusedNoteRowId);
+
+      if (nextFocusedRowId !== null) {
+        this.setState({ focusedNoteRowId: nextFocusedRowId });
+      }
     } else {
       return true;
     }

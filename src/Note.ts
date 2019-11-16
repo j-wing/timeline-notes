@@ -132,6 +132,16 @@ export class Note {
     return this.noteLineIdsOrdered[Math.max(0, lineIndex - 1)];
   }
 
+  getNextRowId(id: number): number | null {
+    let lineIndex = this.noteLineIdsOrdered.indexOf(id);
+
+    if (lineIndex === -1) {
+      return null;
+    }
+
+    return this.noteLineIdsOrdered[Math.min(this.noteLineIdsOrdered.length-1, lineIndex + 1)];
+  }
+
   deleteRow(id: number) {
     this.noteLines.delete(id);
     let idIndex = this.noteLineIdsOrdered.indexOf(id);
