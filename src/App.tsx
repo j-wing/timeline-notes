@@ -158,7 +158,7 @@ class App extends React.Component<AppProps, AppState> {
   handleNoteRowKeyDown(noteRow: NoteLine, e: React.KeyboardEvent) {
     this.editedSinceLastDriveSync = true;
 
-    if (e.key === "Enter") {
+    if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       this.setState((props, state) => {
         let note = this.state.note;
