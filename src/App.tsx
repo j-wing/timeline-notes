@@ -158,14 +158,22 @@ class App extends React.Component<AppProps, AppState> {
   handleNoteRowKeyDown(noteRow: NoteLine, e: React.KeyboardEvent) {
     this.editedSinceLastDriveSync = true;
 
-    if (e.key === "Enter") {
+    if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
-      this.setState((props, state) => {
-        let note = this.state.note;
-        let newNote = note.addLine(noteRow.getIndentedUnits());
+      let note = this.state.note;
+      let newNote: NoteLine | null;
 
-        return { note: note, focusedNoteRowId: newNote.id }
-      });
+      if (e.ctrlKey) {
+        newNote = note.addLine(noteRow.getIndentedUnits());
+      } else {
+        newNote = note.addLineAfter(this.state.focusedNoteRowId, noteRow.getIndentedUnits());
+      }
+
+      if (newNote === null) {
+        return false;
+      }
+
+      this.setState({ note: note, focusedNoteRowId: newNote.id });
       return false;
     } else if (e.key === "Backspace") {
       let focusedRow = this.state.note.getLine(this.state.focusedNoteRowId);
