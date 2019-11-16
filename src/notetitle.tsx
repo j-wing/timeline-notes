@@ -7,27 +7,28 @@ interface NoteTitleProps {
 
 interface NoteTitleState {
     editing: boolean;
+    titleValue: string;
 }
 
 export class NoteTitle extends React.Component<NoteTitleProps, NoteTitleState> {
-    divRef = React.createRef<HTMLDivElement>();
+    inputRef = React.createRef<HTMLInputElement>();
 
     constructor(props: NoteTitleProps) {
         super(props);
 
-        this.state = { editing: false }
+        this.state = { editing: false, titleValue: props.title};
     }
 
     render() {
         return (
-            <div className="note-title"
-            ref={this.divRef}
-            onClick={this.handleClick.bind(this)}
-            contentEditable={true}
-            onKeyDown={this.handleKeyDown.bind(this)}
-            onBlur={this.handleBlur.bind(this)}
-            suppressContentEditableWarning={true}>
-                {this.props.title}
+            <div className="note-title">
+                <input type="text"
+                    ref={this.inputRef}
+                    onClick={this.handleClick.bind(this)}
+                    onKeyDown={this.handleKeyDown.bind(this)}
+                    onChange={this.handleChange.bind(this)}
+                    onBlur={this.handleBlur.bind(this)}
+                    value={this.state.titleValue} />
             </div>
         )
     }
@@ -37,17 +38,20 @@ export class NoteTitle extends React.Component<NoteTitleProps, NoteTitleState> {
     }
 
     handleKeyDown(e: React.KeyboardEvent) {
-        if (e.key === 'Enter' && this.divRef.current !== null) {
+        if (e.key === 'Enter') {
             e.preventDefault();
-            this.props.titleChangeHandler(this.divRef.current.textContent || "");
-            this.setState({ editing: false})
-            this.divRef.current.blur();
+
+            this.props.titleChangeHandler(this.state.titleValue)
+            this.setState({ editing: false});
         }
     }
 
+    handleChange(e: React.FormEvent<HTMLInputElement>) {
+        e.preventDefault();
+        this.setState({ titleValue: e.currentTarget.value});
+    }
+
     handleBlur(e: React.FocusEvent) {
-        if (this.divRef.current !== null) {
-            this.divRef.current.textContent = this.props.title;
-        }
+        this.setState({titleValue: this.props.title});
     }
 }

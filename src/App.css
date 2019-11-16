@@ -39,11 +39,20 @@ body, .root {
 .note-title {
   font-size: 150%;
   text-align: left;
-  font-weight: bold;
   margin: 7px;
   margin-bottom: 17px;
   padding: 3px;
   padding-right: 6px;
+}
+
+.note-title input {
+  background-color: inherit;
+  border: none;
+  font-weight: bold;
+}
+
+.note-title input:focus {
+  outline: none;
 }
 
 .note-title:hover {
