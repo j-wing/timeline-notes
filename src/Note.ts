@@ -33,16 +33,41 @@ export class Note {
     return this.creationTime.getTime();
   }
 
+  private makeNewLine(indentedUnits?: number): NoteLine {
+    return new NoteLine(new Date(), this, indentedUnits);
+  }
+
   addLine(indentedUnits?: number): NoteLine {
-    let noteLine = new NoteLine(new Date(), this, indentedUnits);
+    let noteLine = this.makeNewLine(indentedUnits);
     this.noteLines.set(noteLine.id, noteLine);
     this.noteLineIdsOrdered.push(noteLine.id);
 
     return noteLine;
   }
 
+  addLineAfter(lineId: number, indentedUnits?: number): (NoteLine | null) {
+    let lineIndex = this.noteLineIdsOrdered.indexOf(lineId);
+
+    if (lineIndex === -1) {
+      console.error("Got bad line id in addLineAfter:", lineId, "; current note:", this);
+      return null;
+    }
+
+    let noteLine = this.makeNewLine(indentedUnits);
+
+    this.noteLines.set(noteLine.id, noteLine);
+    this.noteLineIdsOrdered.splice(lineIndex + 1, 0, noteLine.id);
+    return noteLine;
+  }
+
   getLines(): Array<NoteLine> {
-    return Array.from(this.noteLines.values());
+    return Array.from(this.noteLineIdsOrdered.flatMap(id => {
+      let noteLine = this.noteLines.get(id);
+      if (noteLine) {
+        return [noteLine];
+      }
+      return [];
+    }));
   }
 
   getLine(id: number): NoteLine | undefined {
@@ -112,7 +137,7 @@ export class Note {
     let idIndex = this.noteLineIdsOrdered.indexOf(id);
 
     if (idIndex !== -1) {
-      this.noteLineIdsOrdered.splice(idIndex);
+      this.noteLineIdsOrdered.splice(idIndex, 1);
     } else {
       console.error("Tried to delete non-existent row with ID: ", id, this);
     }
