@@ -182,6 +182,12 @@ class App extends React.Component<AppProps, AppState> {
         this.state.note.deleteRow(this.state.focusedNoteRowId);
 
         if (nextFocusedRowId !== null) {
+          if (nextFocusedRowId === this.state.focusedNoteRowId) {
+            // This means the first line had focus, so the new first line
+            // should now have focus.
+            nextFocusedRowId = this.state.note.getFirstNoteLineId();
+          }
+
           this.setState({ focusedNoteRowId: nextFocusedRowId });
         } else {
           console.error("Got a null previous row id relative to: ", this.state.focusedNoteRowId);
