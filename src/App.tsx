@@ -187,6 +187,12 @@ class App extends React.Component<AppProps, AppState> {
         e.preventDefault();
 
       }
+    } else if (e.key === "s" && e.ctrlKey) {
+      // Override Ctrl+S to force a save. This really shouldn't do anything in practice,
+      // since the timer should be running, but it makes it safe for users who have
+      // Ctrl+S muscle memory to use it.
+      DriveSyncHandler.saveNote(this.state.note);
+      e.preventDefault();
     } else {
       return true;
     }
