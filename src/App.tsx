@@ -4,6 +4,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { NoteRow } from './noterow';
 import { NoteLine } from './NoteLine';
 import { NoteTitle } from './notetitle';
+import { NoteRowMirror } from './noterowmirror';
 import { Note } from './Note';
 import { Menu } from './menu';
 import NoteContentHandler from './NoteContentHandler';
@@ -19,12 +20,14 @@ interface AppProps {
 }
 
 interface AppState {
-  focusedNoteRowId: number
-  note: Note
+  focusedNoteRowId: number;
+  note: Note;
+  currentRowCursorText: string;
 }
 
 class App extends React.Component<AppProps, AppState> {
   wrapperElement = React.createRef<HTMLDivElement>();
+  mirrorRef = React.createRef<NoteRowMirror>();
 
   private editedSinceLastDriveSync = false;
   private syncTimer: NodeJS.Timeout | null = null;
@@ -42,7 +45,7 @@ class App extends React.Component<AppProps, AppState> {
     } else {
       firstNoteLineId = note.getFirstNoteLineId();
     }
-    this.state = { note: note, focusedNoteRowId: firstNoteLineId };
+    this.state = { note: note, focusedNoteRowId: firstNoteLineId, currentRowCursorText: ""}
   }
 
   createNewNote(): Note {
@@ -99,7 +102,9 @@ class App extends React.Component<AppProps, AppState> {
   render() {
     let noteRows = this.state.note.getLines().map(noteRow => {
       return (<NoteRow keyDownHandler={this.handleNoteRowKeyDown.bind(this)}
+        keyUpHandler={this.handleNoteRowKeyUp.bind(this)}
         focusHandler={this.noteRowFocusHandler.bind(this)}
+        clickHandler={this.handleNoteRowClick.bind(this)}
         note={this.state.note}
         rowId={noteRow.id}
         key={noteRow.id}
@@ -119,6 +124,9 @@ class App extends React.Component<AppProps, AppState> {
             signInHandler={this.signInHandler.bind(this)} />
         </div>
         {noteRows}
+        <NoteRowMirror
+          value={this.state.currentRowCursorText}
+          ref={this.mirrorRef} />
       </div>
     );
   }
@@ -155,8 +163,14 @@ class App extends React.Component<AppProps, AppState> {
     this.setState({ note: note, focusedNoteRowId: note.getFirstNoteLineId() });
   }
 
-  handleNoteRowKeyDown(noteRow: NoteLine, e: React.KeyboardEvent) {
+  handleNoteRowClick(n: NoteRow) {
+    this.setState({ currentRowCursorText: (n.getTextUntilCursor() || "")});
+  }
+
+  handleNoteRowKeyDown(noteRow: NoteRow, e: React.KeyboardEvent): boolean {
     this.editedSinceLastDriveSync = true;
+
+    let noteLine = noteRow.getNoteLine();
 
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
@@ -164,9 +178,9 @@ class App extends React.Component<AppProps, AppState> {
       let newNote: NoteLine | null;
 
       if (e.ctrlKey) {
-        newNote = note.addLine(noteRow.getIndentedUnits());
+        newNote = note.addLine(noteLine.getIndentedUnits());
       } else {
-        newNote = note.addLineAfter(this.state.focusedNoteRowId, noteRow.getIndentedUnits());
+        newNote = note.addLineAfter(this.state.focusedNoteRowId, noteLine.getIndentedUnits());
       }
 
       if (newNote === null) {
@@ -201,22 +215,34 @@ class App extends React.Component<AppProps, AppState> {
       // Ctrl+S muscle memory to use it.
       DriveSyncHandler.saveNote(this.state.note);
       e.preventDefault();
-    } else if (e.key === "ArrowUp") {
-      let nextFocusedRowId = this.state.note.getPreviousRowId(this.state.focusedNoteRowId);
+    } else if (e.key === "ArrowUp" || e.key === "ArrowDown") {
+      let currentRow: number | null = null;
+      if (this.mirrorRef.current !== null) {
+        currentRow = this.mirrorRef.current.getCurrentRow();
+      }
+
+      if (currentRow === null) {
+        return true;
+      }
+      
+      let nextFocusedRowId: (number | null) = null;
+
+      if (e.key === "ArrowUp" && currentRow === 0) {
+        nextFocusedRowId = this.state.note.getPreviousRowId(this.state.focusedNoteRowId);
+      } else if (e.key === "ArrowDown" && currentRow === noteRow.getNumRows()) {
+        nextFocusedRowId = this.state.note.getNextRowId(this.state.focusedNoteRowId);
+      }
 
       if (nextFocusedRowId !== null) {
         this.setState({ focusedNoteRowId: nextFocusedRowId });
       }
-    } else if (e.key === "ArrowDown") {
-      let nextFocusedRowId = this.state.note.getNextRowId(this.state.focusedNoteRowId);
-
-      if (nextFocusedRowId !== null) {
-        this.setState({ focusedNoteRowId: nextFocusedRowId });
-      }
-    } else {
-      return true;
     }
 
+    return true;
+  }
+
+  handleNoteRowKeyUp(noteRow: NoteRow) {
+    this.setState({ currentRowCursorText: (noteRow.getTextUntilCursor() || "")});
   }
 
   noteRowFocusHandler(note: NoteLine) {

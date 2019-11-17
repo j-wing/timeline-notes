@@ -68,7 +68,7 @@ body, .root {
   padding-right: 8px;
 }
 
-.entrybox {
+.entrybox, .entrybox-mirror {
   width: 100%;
   margin-left: 5px;
   border: none;
@@ -77,6 +77,13 @@ body, .root {
   font-size: 120%;
   background-color: #ddf3fa;
   overflow: hidden;
+}
+
+.entrybox-mirror {
+  position: absolute;
+  left: -10000px;
+  top: -10000px;
+  font-size: 144% /* 120% * 120% */;
 }
 
 .noterow-unfocused .entrybox {
