@@ -6,10 +6,14 @@ import NoteContentHandler from "./NoteContentHandler";
 import { computeIndentString } from "./util";
 import TextareaAutosize from 'react-textarea-autosize';
 
+export const ROW_HEIGHT = 39;
+export const ENTRYBOX_CLASS_NAME = "entrybox";
 
 interface NoteRowProps {
     focusHandler: Function;
-    keyDownHandler: Function;
+    keyDownHandler: (n: NoteRow, e: React.KeyboardEvent) => boolean;
+    keyUpHandler: (n: NoteRow) => void;
+    clickHandler: (n: NoteRow) => void;
     note: Note;
     rowId: number;
     focused: boolean;
@@ -53,10 +57,12 @@ export class NoteRow extends React.Component<NoteRowProps, NoteRowState> {
                 <TextareaAutosize inputRef={this.entryboxElement}
                     onFocus={this.handleEntryboxFocus.bind(this)}
                     onKeyDown={this.handleKeyDown.bind(this)}
+                    onKeyUp={this.handleKeyUp.bind(this)}
                     onChange={this.handleChange.bind(this)}
+                    onClick={this.handleClick.bind(this)}
                     value={this.state.entryboxContent}
                     readOnly={!this.props.focused}
-                    className="entrybox" />
+                    className={ENTRYBOX_CLASS_NAME} />
             </div>
         )
     }
@@ -81,7 +87,6 @@ export class NoteRow extends React.Component<NoteRowProps, NoteRowState> {
     computeEntryboxContent(indentedUnits: number, rawContent: string) {
         return computeIndentString(indentedUnits) + rawContent.trim();
     }
-
 
     componentDidUpdate(oldProps: NoteRowProps, oldState: NoteRowState) {
         if (oldState.indentedUnits !== this.state.indentedUnits) {
@@ -114,13 +119,42 @@ export class NoteRow extends React.Component<NoteRowProps, NoteRowState> {
         }
     }
 
+    getTextUntilCursor(): string | null {
+        let entryboxElem = this.entryboxElement.current
+        if (entryboxElem !== null) {
+            return entryboxElem.value.slice(0, entryboxElem.selectionStart+1);
+        }
+
+        return null;
+    }
+
+    getNumRows(): number {
+        let entryElem = this.entryboxElement.current;
+        if (entryElem !== null) {
+            return Math.floor(entryElem.clientHeight / ROW_HEIGHT); 
+        }
+        return 0;
+    }
+
+    getNoteLine(): NoteLine {
+        return this.noteLine;
+    }
+
+    handleClick(e: React.MouseEvent) {
+        this.props.clickHandler(this);
+    }
+
+    handleKeyUp(e: React.KeyboardEvent) {
+        this.props.keyUpHandler(this);
+    }
+
     handleChange(e: React.ChangeEvent) {
         this.setState({ entryboxContent: (e.target as HTMLTextAreaElement).value, editedSinceLastFocus: true });
         NoteContentHandler.updateNote(this.props.note);
     }
 
     handleKeyDown(e: React.KeyboardEvent) {
-        if (!this.props.keyDownHandler(this.noteLine, e)) {
+        if (!this.props.keyDownHandler(this, e)) {
             return;
         }
 
