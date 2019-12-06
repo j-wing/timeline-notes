@@ -63,13 +63,22 @@ export class Menu extends React.Component<MenuProps, MenuState> {
                 </Dropdown.Item>
                 <Dropdown.Divider />
                 {driveMenuItems}
+                <Dropdown.Divider />
+                <Dropdown.Item onClick={this.githubHandler.bind(this)}>
+                    Source code on GitHub
+                </Dropdown.Item>
+                <Dropdown.Item onClick={this.bugHandler.bind(this)}>
+                    Feedback? File a bug
+                </Dropdown.Item>
             </DropdownButton>
         )
     }
 
-    handleMenuIconClick(e: React.MouseEvent) {
+    githubHandler(e: React.MouseEvent<any>) {
+        window.open("https://github.com/jordonwii/timeline-notes");
     }
 
-    resetHandler(e: React.MouseEvent) {
+    bugHandler(e: React.MouseEvent<any>) {
+        window.open("https://github.com/jordonwii/timeline-notes/issues/new");
     }
 }
