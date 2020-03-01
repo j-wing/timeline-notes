@@ -168,3 +168,9 @@ body, .root {
 .status-area .view-in-docs-link.loading {
   background-image: url(./images/hourglass_empty_black_18x18.png);
 }
+
+.notification-area {
+  position: absolute;
+  left: 50%;
+  transform: translate(-50%);
+}

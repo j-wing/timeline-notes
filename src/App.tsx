@@ -26,6 +26,7 @@ import { Menu } from './menu';
 import NoteContentHandler from './NoteContentHandler';
 import DriveSyncHandler, { DriveSignInState } from './DriveSyncHandler';
 import StatusArea from './statusarea';
+import { Notifier } from './notifier';
 
 
 declare var gapi: any
@@ -44,6 +45,7 @@ interface AppState {
 class App extends React.Component<AppProps, AppState> {
   wrapperElement = React.createRef<HTMLDivElement>();
   mirrorRef = React.createRef<NoteRowMirror>();
+  notifierRef = React.createRef<Notifier>();
 
   private editedSinceLastDriveSync = false;
   private syncTimer: NodeJS.Timeout | null = null;
@@ -61,14 +63,14 @@ class App extends React.Component<AppProps, AppState> {
     } else {
       firstNoteLineId = note.getFirstNoteLineId();
     }
-    this.state = { note: note, focusedNoteRowId: firstNoteLineId, currentRowCursorText: ""}
+    this.state = { note: note, focusedNoteRowId: firstNoteLineId, currentRowCursorText: "" }
   }
 
   createNewNote(): Note {
-      let note = new Note();
-      note.addLine();
+    let note = new Note();
+    note.addLine();
 
-      return note;
+    return note;
   }
 
   componentDidMount() {
@@ -96,7 +98,7 @@ class App extends React.Component<AppProps, AppState> {
 
   componentDidUpdate(oldProps: AppProps, oldState: AppState) {
     if (oldState.note.getTitle() !== this.state.note.getTitle()) {
-      this.updateWindowTitle();      
+      this.updateWindowTitle();
     }
 
   }
@@ -132,12 +134,14 @@ class App extends React.Component<AppProps, AppState> {
         <div className="header">
           <NoteTitle title={this.state.note.getTitle()} titleChangeHandler={this.handleTitleChange.bind(this)} />
           <StatusArea noteDriveId={this.state.note.getDriveId()}
-                      timestampsLocked={this.state.note.getTimestampsLocked()} />
-          <Menu timestampsLocked={this.state.note.getTimestampsLocked()} 
+            timestampsLocked={this.state.note.getTimestampsLocked()} />
+          <Notifier ref={this.notifierRef} />
+          <Menu timestampsLocked={this.state.note.getTimestampsLocked()}
             newNoteHandler={this.newNoteHandler.bind(this)}
             timestampLockToggleHandler={this.handleToggleTimestampsLocked.bind(this)}
             signOutHandler={this.signOutHandler.bind(this)}
-            signInHandler={this.signInHandler.bind(this)} />
+            signInHandler={this.signInHandler.bind(this)}
+            clipboardHandler={this.copyToClipboard.bind(this)} />
         </div>
         {noteRows}
         <NoteRowMirror
@@ -153,6 +157,21 @@ class App extends React.Component<AppProps, AppState> {
 
   signOutHandler() {
     gapi.auth2.getAuthInstance().signOut();
+  }
+
+  copyToClipboard() {
+    navigator.clipboard.writeText(this.state.note.convertToText())
+      .then(() => {
+        if (this.notifierRef.current != null) {
+          this.notifierRef.current.showCopyToClipboardSuccess();
+        }
+      }).catch(
+        r => {
+          if (this.notifierRef.current != null) {
+            this.notifierRef.current.showCopyToClipboardFailed(r);
+          }
+        }
+      )
   }
 
   handleTitleChange(newTitle: string) {
@@ -180,7 +199,7 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   handleNoteRowClick(n: NoteRow) {
-    this.setState({ currentRowCursorText: (n.getTextUntilCursor() || "")});
+    this.setState({ currentRowCursorText: (n.getTextUntilCursor() || "") });
   }
 
   handleNoteRowKeyDown(noteRow: NoteRow, e: React.KeyboardEvent): boolean {
@@ -246,7 +265,7 @@ class App extends React.Component<AppProps, AppState> {
       if (currentRow === null) {
         return true;
       }
-      
+
       let nextFocusedRowId: (number | null) = null;
 
       if (e.key === "ArrowUp" && currentRow === 0) {
@@ -264,7 +283,7 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   handleNoteRowKeyUp(noteRow: NoteRow) {
-    this.setState({ currentRowCursorText: (noteRow.getTextUntilCursor() || "")});
+    this.setState({ currentRowCursorText: (noteRow.getTextUntilCursor() || "") });
   }
 
   noteRowFocusHandler(note: NoteLine) {

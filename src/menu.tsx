@@ -25,6 +25,7 @@ interface MenuProps {
     timestampLockToggleHandler: () => void;
     signInHandler: () => void;
     signOutHandler: () => void;
+    clipboardHandler: () => void;
     timestampsLocked: boolean;
 }
 
@@ -77,6 +78,7 @@ export class Menu extends React.Component<MenuProps, MenuState> {
                 <Dropdown.Item onClick={(e: React.MouseEvent<any>) => this.props.timestampLockToggleHandler()}>
                     {toggleTimestampsString}
                 </Dropdown.Item>
+                <Dropdown.Item onClick={(e: React.MouseEvent<any>) => this.props.clipboardHandler()}>Copy Note Contents</Dropdown.Item>
                 <Dropdown.Divider />
                 {driveMenuItems}
                 <Dropdown.Divider />
