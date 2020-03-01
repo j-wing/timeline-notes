@@ -19,6 +19,7 @@ import DriveSyncHandler, { DriveSyncStatus } from "./DriveSyncHandler";
 
 interface SyncStatusAreaProps {
   noteDriveId: string;
+  signInHandler: () => void;
 }
 
 interface SyncStatusAreaState {
@@ -39,25 +40,28 @@ class SyncStatusArea extends React.Component<SyncStatusAreaProps, SyncStatusArea
 
   render() {
       let className = "";
-      let text = "";
+      let text: JSX.Element;
 
       switch (this.state.syncStatus) {
           case DriveSyncStatus.SYNCING:
               className = "syncing";
-              text = "Syncing note to Drive...";
+              text = <span>Syncing note to Drive...</span>;
               break;
           case DriveSyncStatus.SYNCED:
               className = "synced";
-              text = "Add content to sync note...";
+              text = <span>Add content to sync note...</span>;
               break;
           case DriveSyncStatus.LOADING:
               className = "loading";
-              text = "Loading Drive state...";
+              text = <span>Loading Drive state...</span>;
               break;
           case DriveSyncStatus.SIGNED_OUT:
               className = "signed-out";
-              text = "Not signed into Drive";
+              // eslint-disable-next-line
+              text = <a href="#" onClick={(e: React.MouseEvent<any>) => this.props.signInHandler()}>Not signed into Drive</a>;
               break;
+          default:
+              return;
       }
 
       let showDocsLink = (this.props.noteDriveId.length > 0 && 
@@ -98,6 +102,7 @@ class LockIcon extends React.Component<LockIconProps, LockIconState> {
 interface StatusAreaProps {
     noteDriveId: string;
     timestampsLocked: boolean;
+    signInHandler: () => void;
 }
 
 interface StatusAreaState {}
@@ -105,7 +110,7 @@ interface StatusAreaState {}
 export default class StatusArea extends React.Component<StatusAreaProps, StatusAreaState> {
     render() {
         return <div className="status-area">
-            <SyncStatusArea noteDriveId={this.props.noteDriveId} />
+            <SyncStatusArea noteDriveId={this.props.noteDriveId} signInHandler={this.props.signInHandler} />
             <LockIcon noteLocked={this.props.timestampsLocked} />
         </div>
 
