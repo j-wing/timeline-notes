@@ -150,6 +150,9 @@ body, .root {
 
 .status-area .view-in-docs-link a {
   color: black !important;
+}
+
+.status-area .view-in-docs-link:not(.signed-out) a {
   font-weight: bold;
 }
 
