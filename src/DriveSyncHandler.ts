@@ -30,7 +30,7 @@ const SCOPES = 'https://www.googleapis.com/auth/drive.file';
 const DIRECTORY_MIME = "application/vnd.google-apps.folder";
 const DOC_MIME = "application/vnd.google-apps.document";
 
-const PARENT_NAME = "Synced Interview Notes";
+const PARENT_NAME = "Synced Timeline Notes";
 const PARENT_ID_STORAGE_KEY = "parent-drive-id";
 
 export enum DriveSignInState {
