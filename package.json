@@ -2,7 +2,7 @@
   "name": "notetaker",
   "version": "0.1.0",
   "private": true,
-  "homepage": "time-lines.co/",
+  "homepage": "https://time-lines.co/",
   
   "dependencies": {
     "@types/gapi": "0.0.39",
