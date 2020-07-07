@@ -17,11 +17,20 @@
 import { Note } from "./Note";
 
 const LAST_EDIT_KEY = 'lastEditedNote';
-class LocalStore {
+const STORAGE_VERSION = '1.0';
 
+interface StoredNote {
+    version: string,
+    note: Note,
+}
+
+class LocalStore {
     saveNote(note: Note) {
         let id = this.getNoteStorageId(note);
-        window.localStorage[id] = JSON.stringify(note.serialize());
+        window.localStorage[id] = JSON.stringify({
+            version: STORAGE_VERSION,
+            note: note.serialize()
+        });
         window.localStorage[LAST_EDIT_KEY] = id;
     }
 
@@ -38,7 +47,18 @@ class LocalStore {
             return null;
         }
 
-        return Note.deserialize(JSON.parse(rawNote));
+        let parsed = JSON.parse(rawNote);
+
+        let note: Note;
+        if (!parsed.version) {
+            note = Note.deserialize(parsed);
+            // Update any notes that don't have a version to include one.
+            this.saveNote(note);
+        } else {
+            note = Note.deserialize(parsed.note);
+        }
+
+        return note;
     }
 
     getNoteStorageId(note: Note): string {
