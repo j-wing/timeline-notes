@@ -3,7 +3,6 @@
   "version": "0.1.0",
   "private": true,
   "homepage": "https://time-lines.co/",
-  
   "dependencies": {
     "@types/gapi": "0.0.39",
     "@types/jest": "^24.0.18",

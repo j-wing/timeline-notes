@@ -24,6 +24,7 @@ import TextareaAutosize from 'react-textarea-autosize';
 
 export const ROW_HEIGHT = 39;
 export const ENTRYBOX_CLASS_NAME = "entrybox";
+const EDIT_TIMEOUT = 5000;
 
 interface NoteRowProps {
     focusHandler: Function;
@@ -45,6 +46,7 @@ export class NoteRow extends React.Component<NoteRowProps, NoteRowState> {
     timestampElement = React.createRef<Timestamp>();
     entryboxElement = React.createRef<HTMLTextAreaElement>();
     noteLine: NoteLine;
+    editTimer: number;
 
     constructor(props: NoteRowProps) {
         super(props);
@@ -56,6 +58,7 @@ export class NoteRow extends React.Component<NoteRowProps, NoteRowState> {
         }
 
         this.noteLine = noteLine;
+        this.editTimer = -1;
 
         this.state = {
             indentedUnits: this.noteLine.getIndentedUnits(),
@@ -92,7 +95,7 @@ export class NoteRow extends React.Component<NoteRowProps, NoteRowState> {
         if (isEmpty && this.props.focused) {
             return true;
         }
-        
+
         if (!isEmpty && this.state.editedSinceLastFocus) {
             return true;
         }
@@ -138,7 +141,7 @@ export class NoteRow extends React.Component<NoteRowProps, NoteRowState> {
     getTextUntilCursor(): string | null {
         let entryboxElem = this.entryboxElement.current
         if (entryboxElem !== null) {
-            return entryboxElem.value.slice(0, entryboxElem.selectionStart+1);
+            return entryboxElem.value.slice(0, entryboxElem.selectionStart + 1);
         }
 
         return null;
@@ -147,7 +150,7 @@ export class NoteRow extends React.Component<NoteRowProps, NoteRowState> {
     getNumRows(): number {
         let entryElem = this.entryboxElement.current;
         if (entryElem !== null) {
-            return Math.floor(entryElem.clientHeight / ROW_HEIGHT); 
+            return Math.floor(entryElem.clientHeight / ROW_HEIGHT);
         }
         return 0;
     }
@@ -167,6 +170,16 @@ export class NoteRow extends React.Component<NoteRowProps, NoteRowState> {
     handleChange(e: React.ChangeEvent) {
         this.setState({ entryboxContent: (e.target as HTMLTextAreaElement).value, editedSinceLastFocus: true });
         NoteContentHandler.updateNote(this.props.note);
+
+        if (this.editTimer !== -1) {
+            window.clearTimeout(this.editTimer);
+        }
+
+        this.editTimer = window.setTimeout(this.handleEditTimeout.bind(this), EDIT_TIMEOUT);
+    }
+
+    handleEditTimeout() {
+        this.setState({ editedSinceLastFocus: false });
     }
 
     handleKeyDown(e: React.KeyboardEvent) {
