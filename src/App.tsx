@@ -14,27 +14,25 @@
  * limitations under the License.
  */
 
-import React from 'react';
-import './App.css';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import { NoteRow } from './noterow';
-import { NoteLine } from './NoteLine';
-import { NoteTitle } from './notetitle';
-import { NoteRowMirror } from './noterowmirror';
-import { Note } from './Note';
-import { Menu } from './menu';
-import NoteContentHandler from './NoteContentHandler';
-import DriveSyncHandler, { DriveSignInState } from './DriveSyncHandler';
-import StatusArea from './statusarea';
-import { Notifier } from './notifier';
+import React from "react";
+import "./App.css";
+import "bootstrap/dist/css/bootstrap.min.css";
+import { NoteRow } from "./noterow";
+import { NoteLine } from "./NoteLine";
+import { NoteTitle } from "./notetitle";
+import { NoteRowMirror } from "./noterowmirror";
+import { Note } from "./Note";
+import { Menu } from "./menu";
+import NoteContentHandler from "./NoteContentHandler";
+import DriveSyncHandler, { DriveSignInState } from "./DriveSyncHandler";
+import StatusArea from "./statusarea";
+import { Notifier } from "./notifier";
 
-
-declare var gapi: any
+declare var gapi: any;
 
 const SYNC_TIMEOUT = 2000;
 
-interface AppProps {
-}
+interface AppProps {}
 
 interface AppState {
   focusedNoteRowId: number;
@@ -63,7 +61,11 @@ class App extends React.Component<AppProps, AppState> {
     } else {
       firstNoteLineId = note.getFirstNoteLineId();
     }
-    this.state = { note: note, focusedNoteRowId: firstNoteLineId, currentRowCursorText: "" }
+    this.state = {
+      note: note,
+      focusedNoteRowId: firstNoteLineId,
+      currentRowCursorText: "",
+    };
   }
 
   createNewNote(): Note {
@@ -84,7 +86,7 @@ class App extends React.Component<AppProps, AppState> {
         return;
       }
 
-      DriveSyncHandler.saveNote(this.state.note).then(noteId => {
+      DriveSyncHandler.saveNote(this.state.note).then((noteId) => {
         let note = this.state.note;
         if (noteId.length > 0) {
           note.setDriveId(noteId);
@@ -100,7 +102,6 @@ class App extends React.Component<AppProps, AppState> {
     if (oldState.note.getTitle() !== this.state.note.getTitle()) {
       this.updateWindowTitle();
     }
-
   }
 
   async syncTimerHandler() {
@@ -109,7 +110,7 @@ class App extends React.Component<AppProps, AppState> {
       if (id.length > 0) {
         let note = this.state.note;
         note.setDriveId(id);
-        this.setState({ note: note })
+        this.setState({ note: note });
       }
       this.editedSinceLastDriveSync = false;
     }
@@ -118,36 +119,50 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   render() {
-    let noteRows = this.state.note.getLines().map(noteRow => {
-      return (<NoteRow keyDownHandler={this.handleNoteRowKeyDown.bind(this)}
-        keyUpHandler={this.handleNoteRowKeyUp.bind(this)}
-        focusHandler={this.noteRowFocusHandler.bind(this)}
-        clickHandler={this.handleNoteRowClick.bind(this)}
-        note={this.state.note}
-        rowId={noteRow.id}
-        key={noteRow.id}
-        focused={noteRow.id === this.state.focusedNoteRowId} />);
+    let noteRows = this.state.note.getLines().map((noteRow) => {
+      return (
+        <NoteRow
+          keyDownHandler={this.handleNoteRowKeyDown.bind(this)}
+          keyUpHandler={this.handleNoteRowKeyUp.bind(this)}
+          focusHandler={this.noteRowFocusHandler.bind(this)}
+          clickHandler={this.handleNoteRowClick.bind(this)}
+          note={this.state.note}
+          rowId={noteRow.id}
+          key={noteRow.id}
+          focused={noteRow.id === this.state.focusedNoteRowId}
+        />
+      );
     });
 
     return (
       <div className="App" ref={this.wrapperElement}>
         <div className="header">
-          <NoteTitle title={this.state.note.getTitle()} titleChangeHandler={this.handleTitleChange.bind(this)} />
-          <StatusArea noteDriveId={this.state.note.getDriveId()}
+          <NoteTitle
+            title={this.state.note.getTitle()}
+            titleChangeHandler={this.handleTitleChange.bind(this)}
+          />
+          <StatusArea
+            noteDriveId={this.state.note.getDriveId()}
             timestampsLocked={this.state.note.getTimestampsLocked()}
-            signInHandler={this.signInHandler.bind(this)} />
+            signInHandler={this.signInHandler.bind(this)}
+          />
           <Notifier ref={this.notifierRef} />
-          <Menu timestampsLocked={this.state.note.getTimestampsLocked()}
+          <Menu
+            timestampsLocked={this.state.note.getTimestampsLocked()}
             newNoteHandler={this.newNoteHandler.bind(this)}
-            timestampLockToggleHandler={this.handleToggleTimestampsLocked.bind(this)}
+            timestampLockToggleHandler={this.handleToggleTimestampsLocked.bind(
+              this
+            )}
             signOutHandler={this.signOutHandler.bind(this)}
             signInHandler={this.signInHandler.bind(this)}
-            clipboardHandler={this.copyToClipboard.bind(this)} />
+            clipboardHandler={this.copyToClipboard.bind(this)}
+          />
         </div>
         {noteRows}
         <NoteRowMirror
           value={this.state.currentRowCursorText}
-          ref={this.mirrorRef} />
+          ref={this.mirrorRef}
+        />
       </div>
     );
   }
@@ -161,18 +176,18 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   copyToClipboard() {
-    navigator.clipboard.writeText(this.state.note.convertToText())
+    navigator.clipboard
+      .writeText(this.state.note.convertToText())
       .then(() => {
         if (this.notifierRef.current != null) {
           this.notifierRef.current.showCopyToClipboardSuccess();
         }
-      }).catch(
-        r => {
-          if (this.notifierRef.current != null) {
-            this.notifierRef.current.showCopyToClipboardFailed(r);
-          }
+      })
+      .catch((r) => {
+        if (this.notifierRef.current != null) {
+          this.notifierRef.current.showCopyToClipboardFailed(r);
         }
-      )
+      });
   }
 
   handleTitleChange(newTitle: string) {
@@ -200,7 +215,7 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   handleNoteRowClick(n: NoteRow) {
-    this.setState({ currentRowCursorText: (n.getTextUntilCursor() || "") });
+    this.setState({ currentRowCursorText: n.getTextUntilCursor() || "" });
   }
 
   handleNoteRowKeyDown(noteRow: NoteRow, e: React.KeyboardEvent): boolean {
@@ -216,7 +231,10 @@ class App extends React.Component<AppProps, AppState> {
       if (e.ctrlKey) {
         newNote = note.addLine(noteLine.getIndentedUnits());
       } else {
-        newNote = note.addLineAfter(this.state.focusedNoteRowId, noteLine.getIndentedUnits());
+        newNote = note.addLineAfter(
+          this.state.focusedNoteRowId,
+          noteLine.getIndentedUnits()
+        );
       }
 
       if (newNote === null) {
@@ -227,8 +245,14 @@ class App extends React.Component<AppProps, AppState> {
       return false;
     } else if (e.key === "Backspace") {
       let focusedRow = this.state.note.getLine(this.state.focusedNoteRowId);
-      if (focusedRow !== undefined && focusedRow.isEmpty() && this.state.note.getLines().length > 1) {
-        let nextFocusedRowId = this.state.note.getPreviousRowId(this.state.focusedNoteRowId);
+      if (
+        focusedRow !== undefined &&
+        focusedRow.isEmpty() &&
+        this.state.note.getLines().length > 1
+      ) {
+        let nextFocusedRowId = this.state.note.getPreviousRowId(
+          this.state.focusedNoteRowId
+        );
         this.state.note.deleteRow(this.state.focusedNoteRowId);
 
         if (nextFocusedRowId !== null) {
@@ -240,8 +264,13 @@ class App extends React.Component<AppProps, AppState> {
 
           this.setState({ focusedNoteRowId: nextFocusedRowId });
         } else {
-          console.error("Got a null previous row id relative to: ", this.state.focusedNoteRowId);
-          this.setState({ focusedNoteRowId: this.state.note.getFirstNoteLineId() });
+          console.error(
+            "Got a null previous row id relative to: ",
+            this.state.focusedNoteRowId
+          );
+          this.setState({
+            focusedNoteRowId: this.state.note.getFirstNoteLineId(),
+          });
         }
 
         NoteContentHandler.updateNote(this.state.note);
@@ -249,7 +278,6 @@ class App extends React.Component<AppProps, AppState> {
         // Since we're catching the keydown event, if we don't call preventDefault,
         // a character will get deleted on the line that gets focus.
         e.preventDefault();
-
       }
     } else if (e.key === "s" && e.ctrlKey) {
       // Override Ctrl+S to force a save. This really shouldn't do anything in practice,
@@ -267,12 +295,16 @@ class App extends React.Component<AppProps, AppState> {
         return true;
       }
 
-      let nextFocusedRowId: (number | null) = null;
+      let nextFocusedRowId: number | null = null;
 
       if (e.key === "ArrowUp" && currentRow === 0) {
-        nextFocusedRowId = this.state.note.getPreviousRowId(this.state.focusedNoteRowId);
+        nextFocusedRowId = this.state.note.getPreviousRowId(
+          this.state.focusedNoteRowId
+        );
       } else if (e.key === "ArrowDown" && currentRow === noteRow.getNumRows()) {
-        nextFocusedRowId = this.state.note.getNextRowId(this.state.focusedNoteRowId);
+        nextFocusedRowId = this.state.note.getNextRowId(
+          this.state.focusedNoteRowId
+        );
       }
 
       if (nextFocusedRowId !== null) {
@@ -284,7 +316,7 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   handleNoteRowKeyUp(noteRow: NoteRow) {
-    this.setState({ currentRowCursorText: (noteRow.getTextUntilCursor() || "") });
+    this.setState({ currentRowCursorText: noteRow.getTextUntilCursor() || "" });
   }
 
   noteRowFocusHandler(note: NoteLine) {
