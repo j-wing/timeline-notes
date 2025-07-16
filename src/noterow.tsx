@@ -44,7 +44,7 @@ interface NoteRowState {
 
 export class NoteRow extends React.Component<NoteRowProps, NoteRowState> {
     timestampElement = React.createRef<Timestamp>();
-    entryboxElement = React.createRef<HTMLTextAreaElement>();
+    entryboxElement: HTMLTextAreaElement | null = null;
     noteLine: NoteLine;
     editTimer: number;
 
@@ -73,7 +73,13 @@ export class NoteRow extends React.Component<NoteRowProps, NoteRowState> {
                 <Timestamp ref={this.timestampElement}
                     initialTimestamp={this.noteLine.getLastEditTimestamp()}
                     shouldTick={this.computeTimestampShouldTick()} />
-                <TextareaAutosize inputRef={this.entryboxElement}
+                <TextareaAutosize ref={(component: any) => {
+                    const el = component?.textareaRef || component;
+                    this.entryboxElement = el;
+                    if (el && this.props.focused) {
+                        el.focus();
+                    }
+                }}
                     onFocus={this.handleEntryboxFocus.bind(this)}
                     onKeyDown={this.handleKeyDown.bind(this)}
                     onKeyUp={this.handleKeyUp.bind(this)}
@@ -121,36 +127,33 @@ export class NoteRow extends React.Component<NoteRowProps, NoteRowState> {
         }
 
         if (oldProps.focused !== this.props.focused && !this.props.focused) {
-            this.setState({ editedSinceLastFocus: false })
+            this.setState({ editedSinceLastFocus: false });
         }
-        if (this.entryboxElement.current !== null) {
-            if (this.props.focused) {
-                this.entryboxElement.current.focus();
+        
+        if (this.props.focused && oldProps.focused !== this.props.focused) {
+            if (this.entryboxElement) {
+                this.entryboxElement.focus();
             }
         }
     }
 
     componentDidMount() {
-        if (this.entryboxElement.current !== null) {
-            if (this.props.focused) {
-                this.entryboxElement.current.focus();
-            }
+        if (this.props.focused && this.entryboxElement) {
+            this.entryboxElement.focus();
         }
     }
 
     getTextUntilCursor(): string | null {
-        let entryboxElem = this.entryboxElement.current
-        if (entryboxElem !== null) {
-            return entryboxElem.value.slice(0, entryboxElem.selectionStart + 1);
+        if (this.entryboxElement !== null) {
+            return this.entryboxElement.value.slice(0, this.entryboxElement.selectionStart + 1);
         }
 
         return null;
     }
 
     getNumRows(): number {
-        let entryElem = this.entryboxElement.current;
-        if (entryElem !== null) {
-            return Math.floor(entryElem.clientHeight / ROW_HEIGHT);
+        if (this.entryboxElement !== null) {
+            return Math.floor(this.entryboxElement.clientHeight / ROW_HEIGHT);
         }
         return 0;
     }
@@ -200,9 +203,10 @@ export class NoteRow extends React.Component<NoteRowProps, NoteRowState> {
     handleEntryboxFocus(e: React.FocusEvent) {
         this.props.focusHandler(this.noteLine);
 
-        if (this.state.entryboxContent.trim().length === 0 && this.entryboxElement.current != null) {
-            let currentRawLength = this.entryboxElement.current.textLength;
-            this.entryboxElement.current.setSelectionRange(currentRawLength, currentRawLength);
+        if (this.state.entryboxContent.trim().length === 0 && this.entryboxElement != null) {
+            let currentRawLength = this.entryboxElement.textLength;
+            this.entryboxElement.setSelectionRange(currentRawLength, currentRawLength);
         }
     }
+
 }
