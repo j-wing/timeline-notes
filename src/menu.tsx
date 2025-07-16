@@ -45,7 +45,6 @@ export class Menu extends React.Component<MenuProps, MenuState> {
   }
 
   render() {
-    console.log("Menu render", this.state);
     let toggleTimestampsString = this.props.timestampsLocked
       ? "Unlock Timestamps"
       : "Lock Timestamps";
