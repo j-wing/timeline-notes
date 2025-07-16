@@ -158,6 +158,28 @@ export class NoteRow extends React.Component<NoteRowProps, NoteRowState> {
         return 0;
     }
 
+    isCursorOnFirstLine(): boolean {
+        if (!this.entryboxElement) return true;
+        
+        const textarea = this.entryboxElement;
+        const cursorPos = textarea.selectionStart;
+        const textBeforeCursor = textarea.value.substring(0, cursorPos);
+        
+        // If there's no newline before cursor, we're on first line
+        return !textBeforeCursor.includes('\n');
+    }
+
+    isCursorOnLastLine(): boolean {
+        if (!this.entryboxElement) return true;
+        
+        const textarea = this.entryboxElement;
+        const cursorPos = textarea.selectionStart;
+        const textAfterCursor = textarea.value.substring(cursorPos);
+        
+        // If there's no newline after cursor, we're on last line
+        return !textAfterCursor.includes('\n');
+    }
+
     getNoteLine(): NoteLine {
         return this.noteLine;
     }

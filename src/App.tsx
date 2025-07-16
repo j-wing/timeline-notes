@@ -286,29 +286,22 @@ class App extends React.Component<AppProps, AppState> {
       DriveSyncHandler.saveNote(this.state.note);
       e.preventDefault();
     } else if (e.key === "ArrowUp" || e.key === "ArrowDown") {
-      let currentRow: number | null = null;
-      if (this.mirrorRef.current !== null) {
-        currentRow = this.mirrorRef.current.getCurrentRow();
-      }
-
-      if (currentRow === null) {
-        return true;
-      }
-
       let nextFocusedRowId: number | null = null;
 
-      if (e.key === "ArrowUp" && currentRow === 0) {
+      if (e.key === "ArrowUp" && noteRow.isCursorOnFirstLine()) {
         nextFocusedRowId = this.state.note.getPreviousRowId(
           this.state.focusedNoteRowId
         );
-      } else if (e.key === "ArrowDown" && currentRow === noteRow.getNumRows()) {
+      } else if (e.key === "ArrowDown" && noteRow.isCursorOnLastLine()) {
         nextFocusedRowId = this.state.note.getNextRowId(
           this.state.focusedNoteRowId
         );
       }
 
       if (nextFocusedRowId !== null) {
+        e.preventDefault(); // Prevent default arrow key behavior
         this.setState({ focusedNoteRowId: nextFocusedRowId });
+        return false; // Stop further processing
       }
     }
 
